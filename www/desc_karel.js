@@ -239,7 +239,7 @@ function if_expression()
     InterCode[ InterCodeIndex++ ] = instructions.IF;
     if ( require("(") ) {
       conditional();
-      if ( require(",") ) {
+      if ( require(")") ) {
         InterCode[ InterCodeIndex++ ] = instructions.JMP;
         PosX_jmptrue = InterCodeIndex++;
         if ( require("{") )
@@ -362,10 +362,126 @@ function while_expression()
     showErrorMessage(4);
   }
 }
+// <composed condition> ::= <not condition> <simple condition>
+
+// <composed condition prima>
+
+// <not condition> ::= "!" | lambda
+
+// <composed condition prima> ::= <or condition> | lambda
+
+// <or condition> ::= "||" <simple condition> | <and condition>
+
+// <and condition> ::= "&&" <simple condition> | lambda
+
+
 
 //<iterate expression> ::= "iterate" "(" <number> "," "{" <body> "}"
 
 //<conditional> ::= <simple condition> | <composed condition>
+function conditional(){
+	// do{
+		if (read("!")) {
+			require("!");
+			InterCode [InterCodeIndex++] = instructions.NOT;
+		}
+		if (read_simple_condition()) {
+			currentToken++;
+			if (read("&&")){
+				currentToken-=1;
+				and_condition();
+			}
+			else if (read("||")) {
+				currentToken-=1;
+				or_condition();
+			}
+			currentToken--;
+			if (!require_simple_condition()) {
+				showErrorMessage(5);
+			}
+		}else{
+			showErrorMessage(5);
+		}
+	// }while ((read("!") || read("||") || read("&&") || read_simple_condition()))
+}
+
+function or_condition(){
+	InterCode [InterCodeIndex++] = instructions.OR;
+	if (require_simple_condition()){
+		if(require("||")){
+			if(!require_simple_condition()){
+				showErrorMessage(5);
+			}
+		}
+		else{
+			showErrorMessage(2);
+		}
+	}
+	else{
+		showErrorMessage(5);
+	}
+}
+
+function and_condition(){
+	InterCode [InterCodeIndex++] = instructions.AND;
+	if (require_simple_condition()){
+		if(require("&&")){
+			if(!require_simple_condition()){
+				showErrorMessage(5);
+			}
+		}
+		else{
+			showErrorMessage(2);
+		}
+	}
+	else{
+		showErrorMessage(5);
+	}
+}
+
+function read_simple_condition(){
+	return (read("frontIsClear") ||
+			read("frontIsBlocked") ||
+			read("leftIsClear") ||
+			read("leftIsBlocked") ||
+			read("rightIsClear") ||
+			read("rightIsBlocked") ||
+			read("nextToABeeper") ||
+			read("notNextToABeeper") ||
+			read("anyBeepersInBeeperBag") ||
+			read("noBeepersInBeeperBag") ||
+			read("facingNorth") ||
+			read("facingSouth") ||
+			read("facingEast") ||
+			read("facingWest") ||
+			read("notFacingNorth") ||
+			read("notFacingSouth") ||
+			read("notFacingEast") ||
+			read("notFacingWest")
+			);
+}
+
+function require_simple_condition(){
+	return (require("frontIsClear") ||
+			require("frontIsBlocked") ||
+			require("leftIsClear") ||
+			require("leftIsBlocked") ||
+			require("rightIsClear") ||
+			require("rightIsBlocked") ||
+			require("nextToABeeper") ||
+			require("notNextToABeeper") ||
+			require("anyBeepersInBeeperBag") ||
+			require("noBeepersInBeeperBag") ||
+			require("facingNorth") ||
+			require("facingSouth") ||
+			require("facingEast") ||
+			require("facingWest") ||
+			require("notFacingNorth") ||
+			require("notFacingSouth") ||
+			require("notFacingEast") ||
+			require("notFacingWest")
+			);
+}
 /*function conditional()
 {
   var condition;
@@ -416,7 +532,7 @@ function leerCondicional(condition)
 */
 /*
 <simple condition> ::=
-  "frontIsClear"
+    "frontIsClear"
   | "frontIsBlocked"
   | "leftIsClear"
   | "leftIsBlocked"
@@ -434,24 +550,4 @@ function leerCondicional(condition)
   | "notFacingSouth"
   | "notFacingEast"
   | "notFacingWest"
-*/
-
-//<composed condition> ::=   <simple condition> [ <or condition> ]
-
-/*
-<or condition> ::=
-    "||" <simple condition> |
-    [ <and condition> ]
-*/
-
-/*
-<and condition> ::=
-    "&&" <simple condition> |
-    [ <not condition> ]
-*/
-
-/*
-<not condition> ::=
-  "!" <simple condition> |
-  <simple condition>
 */

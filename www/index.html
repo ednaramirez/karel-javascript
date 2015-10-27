@@ -3,24 +3,35 @@
 <script src="error_lib.js"></script>
 <script type="text/javascript">
 	var aTokensInput =
-	  [
-	    "class",
-	    "program",
-	    "{",
-	    "program",
-	    "(",
-	    ")",
-	    "{",
-	    "turnleft",
-	    "(",
-	    ")",
-	    "turnoff",
-	    "(",
-	    ")",
-	    "}",
-	    "}"
-	  ],
-	 currentToken = 0;
+		[
+			"class",
+			"program",
+			"{",
+			"program",
+			"(",
+			")",
+			"{",
+			"if",
+			"(",
+			"!",
+			"frontIsClear",
+			"||",
+			"frontIsClear",
+			// "&&",
+			// "frontIsClear",
+			")",
+			"{",
+			"turnleft",
+			"(",
+			")",
+			"}",
+			"turnoff",
+			"(",
+			")",
+			"}",
+			"}"
+		],
+	currentToken = 0;
 
 	program();
 
