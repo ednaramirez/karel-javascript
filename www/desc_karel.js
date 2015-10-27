@@ -196,21 +196,21 @@ function name_of_function()
 */
 function official_function()
 {
-  if ( read("turnleft") )
-  {
-    require("turnleft");   //move karel 1 point ahead
+  if ( read("move")){
+    require("move");   //move karel 1 point ahead
   }
-  else {
-    if ( read("turnoff") )    //turn off karel
-    {
+  else if(read("turnoff")){
       require("turnoff");
     }
-    /*
-      "move" |
-      "pickbeeper" |
-      "putbeeper"
-    */
-  }
+  else if(read("pickbeeper")) {
+      require("pickbeeper");
+    }
+  else if(read("turnleft")){
+      require("turnleft");
+    }
+  else{
+      require("putbeeper");
+    }
 }
 
 //<customer function> ::= <string without spaces>
