@@ -1,6 +1,7 @@
 <script src="meta_karel.js"></script>
 <script src="desc_karel.js"></script>
 <script src="error_lib.js"></script>
+<script src="semantico.js"></script>
 <script type="text/javascript">
 	var aTokensInput =
 		[
@@ -11,20 +12,27 @@
 			"(",
 			")",
 			"{",
-			"if",
+			"move",
 			"(",
-			"!",
-			"frontIsClear",
-			"||",
-			"frontIsClear",
-			// "&&",
-			// "frontIsClear",
 			")",
-			"{",
 			"turnleft",
 			"(",
 			")",
-			"}",
+			"move",
+			"(",
+			")",
+			"move",
+			"(",
+			")",
+			"turnleft",
+			"(",
+			")",
+			"turnleft",
+			"(",
+			")",
+			"turnleft",
+			"(",
+			")",
 			"turnoff",
 			"(",
 			")",
@@ -34,5 +42,6 @@
 	currentToken = 0;
 
 	program();
+	execute();
 
 </script>

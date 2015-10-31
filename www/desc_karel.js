@@ -82,14 +82,14 @@ function _function () {
     }
     else
     {
-        showErrorMessage(5);
+      showErrorMessage(5);
     }
   }
   else
   {
       //Syntax error
+    }
   }
-}
 
 // <name function> ::= <string without spaces>
 function name_function() {
@@ -172,11 +172,11 @@ function call_function()
 function name_of_function()
 {
   if ( read("move") ||
-       read("turnoff") ||
-       read("pickbeeper") ||
-       read("turnleft") ||
-       read("putbeeper")
-     )
+   read("turnoff") ||
+   read("pickbeeper") ||
+   read("turnleft") ||
+   read("putbeeper")
+   )
   {
     official_function();
   }
@@ -193,25 +193,36 @@ function name_of_function()
     "pickbeeper" |
     "turnleft" |
     "putbeeper"
-*/
-function official_function()
-{
-  if ( read("move")){
-    require("move");   //move karel 1 point ahead
-  }
-  else if(read("turnoff")){
-      require("turnoff");
+    */
+    function official_function()
+    {
+      if ( read("move")){
+        require("move");   
+        InterCode[ InterCodeIndex++ ] = instructions.MOVE;
+
+
+      }
+      else if(read("turnoff")){
+        require("turnoff");
+        InterCode[ InterCodeIndex++ ] = instructions.TURNOFF;
+
+      }
+      else if(read("pickbeeper")) {
+        require("pickbeeper");
+        InterCode[ InterCodeIndex++ ] = instructions.PICKBEEPER;
+
+      }
+      else if(read("turnleft")){
+        require("turnleft");
+        InterCode[ InterCodeIndex++ ] = instructions.TURNLEFT;
+
+      }
+      else{
+        require("putbeeper");
+        InterCode[ InterCodeIndex++ ] = instructions.PUTBEEBER;
+
+      }
     }
-  else if(read("pickbeeper")) {
-      require("pickbeeper");
-    }
-  else if(read("turnleft")){
-      require("turnleft");
-    }
-  else{
-      require("putbeeper");
-    }
-}
 
 //<customer function> ::= <string without spaces>
 function customer_function()
@@ -312,27 +323,27 @@ function elseif( PosX_jmptrue )
 }
 
 //<while expression> ::= "while" "(" <conditional> "," "{" <body> "}"
-function while_expression()
-{
-  var PosX_jmptrue;
-  var PosY_beginWhile;
-  if ( require("while") )
+  function while_expression()
   {
-    PosY_beginWhile = InterCodeIndex;
-    InterCode[ InterCodeIndex++ ] = instructions.IF;
-    if ( require("(") )
+    var PosX_jmptrue;
+    var PosY_beginWhile;
+    if ( require("while") )
     {
-      conditional();
-      if ( require(",") )
+      PosY_beginWhile = InterCodeIndex;
+      InterCode[ InterCodeIndex++ ] = instructions.IF;
+      if ( require("(") )
       {
-        InterCode[ InterCodeIndex++ ] = instructions.JMP;
-        PosX_jmptrue = InterCodeIndex++;
-        if ( require("{") )
+        conditional();
+        if ( require(",") )
         {
-          body();
-          if ( !require("}") )
+          InterCode[ InterCodeIndex++ ] = instructions.JMP;
+          PosX_jmptrue = InterCodeIndex++;
+          if ( require("{") )
           {
-            showErrorMessage(3);
+            body();
+            if ( !require("}") )
+            {
+              showErrorMessage(3);
             //error de sintaxis, fin de ejecucion
           }
           InterCode[ InterCodeIndex++ ] = instructions.JMP;
@@ -378,6 +389,44 @@ function while_expression()
 
 //<iterate expression> ::= "iterate" "(" <number> "," "{" <body> "}"
 
+  function iterate_expression(){
+    if(require("iterate")){
+      InterCode[ InterCodeIndex++ ] = instructions.ITERATE;
+      if(require("(")){
+        //requireN();
+        if(require(")")){
+          if(require("{")){
+            body();
+            if(require("}")){
+            }
+            else{
+              showErrorMessage(3);
+
+            }
+          }
+          else{
+            showErrorMessage(1);
+
+          }
+
+        }
+        else{
+          showErrorMessage(2);
+
+        }
+      }
+      else{
+        showErrorMessage(5);
+      }
+    }
+    else{
+      showErrorMessage(4);
+    }
+  }
+
+
+
+
 //<conditional> ::= <simple condition> | <composed condition>
 function conditional(){
 	// do{
@@ -392,16 +441,16 @@ function conditional(){
 				and_condition();
 			}
 			else if (read("||")) {
-				currentToken-=1;
-				or_condition();
-			}
-			currentToken--;
-			if (!require_simple_condition()) {
-				showErrorMessage(5);
-			}
-		}else{
-			showErrorMessage(5);
-		}
+        currentToken-=1;
+        or_condition();
+      }
+      currentToken--;
+      if (!require_simple_condition()) {
+        showErrorMessage(5);
+      }
+    }else{
+     showErrorMessage(5);
+   }
 	// }while ((read("!") || read("||") || read("&&") || read_simple_condition()))
 }
 
@@ -441,46 +490,46 @@ function and_condition(){
 
 function read_simple_condition(){
 	return (read("frontIsClear") ||
-			read("frontIsBlocked") ||
-			read("leftIsClear") ||
-			read("leftIsBlocked") ||
-			read("rightIsClear") ||
-			read("rightIsBlocked") ||
-			read("nextToABeeper") ||
-			read("notNextToABeeper") ||
-			read("anyBeepersInBeeperBag") ||
-			read("noBeepersInBeeperBag") ||
-			read("facingNorth") ||
-			read("facingSouth") ||
-			read("facingEast") ||
-			read("facingWest") ||
-			read("notFacingNorth") ||
-			read("notFacingSouth") ||
-			read("notFacingEast") ||
-			read("notFacingWest")
-			);
+   read("frontIsBlocked") ||
+   read("leftIsClear") ||
+   read("leftIsBlocked") ||
+   read("rightIsClear") ||
+   read("rightIsBlocked") ||
+   read("nextToABeeper") ||
+   read("notNextToABeeper") ||
+   read("anyBeepersInBeeperBag") ||
+   read("noBeepersInBeeperBag") ||
+   read("facingNorth") ||
+   read("facingSouth") ||
+   read("facingEast") ||
+   read("facingWest") ||
+   read("notFacingNorth") ||
+   read("notFacingSouth") ||
+   read("notFacingEast") ||
+   read("notFacingWest")
+   );
 }
 
 function require_simple_condition(){
 	return (require("frontIsClear") ||
-			require("frontIsBlocked") ||
-			require("leftIsClear") ||
-			require("leftIsBlocked") ||
-			require("rightIsClear") ||
-			require("rightIsBlocked") ||
-			require("nextToABeeper") ||
-			require("notNextToABeeper") ||
-			require("anyBeepersInBeeperBag") ||
-			require("noBeepersInBeeperBag") ||
-			require("facingNorth") ||
-			require("facingSouth") ||
-			require("facingEast") ||
-			require("facingWest") ||
-			require("notFacingNorth") ||
-			require("notFacingSouth") ||
-			require("notFacingEast") ||
-			require("notFacingWest")
-			);
+   require("frontIsBlocked") ||
+   require("leftIsClear") ||
+   require("leftIsBlocked") ||
+   require("rightIsClear") ||
+   require("rightIsBlocked") ||
+   require("nextToABeeper") ||
+   require("notNextToABeeper") ||
+   require("anyBeepersInBeeperBag") ||
+   require("noBeepersInBeeperBag") ||
+   require("facingNorth") ||
+   require("facingSouth") ||
+   require("facingEast") ||
+   require("facingWest") ||
+   require("notFacingNorth") ||
+   require("notFacingSouth") ||
+   require("notFacingEast") ||
+   require("notFacingWest")
+   );
 }
 /*function conditional()
 {

@@ -25,7 +25,15 @@ var MAX_LENGHT_IDENTIFICADOR = 25,
     'NOT_FACING_NORTH': 22,
     'NOT_FACING_SOUTH': 23,
     'NOT_FACING_EAST': 24,
-    'NOT_FACING_WEST': 25};
+    'NOT_FACING_WEST': 25,
+    'JMP_COND' : 26,
+    'ITERATE' : 27,
+    'MOVE' : 28,
+    'TURNLEFT' : 29,
+    'TURNOFF' : 30,
+    'PICKBEEPER' : 31,
+    'PUTBEEPER' : 32
+    };
 
 var SymbolTable = [];
 
@@ -40,6 +48,10 @@ function string_without_spaces(nameFunction){
 
 function require(requiredToken){
 	return requiredToken == aTokensInput[currentToken++];
+}
+
+function requireN(){
+    return  aTokensInput[currentToken++]; //falta
 }
 
 function read(requiredToken){
