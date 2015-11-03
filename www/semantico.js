@@ -7,7 +7,7 @@ var karel = {
 }
 var world = [
 			['','','','',''],
-			['','','W','B',''],
+			['','','W','2',''],
 			['','','W','W',''],
 			['','','','',''],
 			['','','','','']
@@ -26,17 +26,32 @@ while(InterCode[i] != instructions.TURNOFF){
 
 		case instructions.MOVE: 
 				if(karel.facing == "U"){
-					
+					if(world[karel.row - 1][karel.column] == "W" || karel.row == 0){
+						alert("Kill me because MOVE")
+						return
+					}
 					karel.row--;
 					
 				}
 				else if(karel.facing == "D"){
+					if(world[karel.row + 1][karel.column] == "W" || karel.row == world.lenght - 1){
+						alert("Kill me because MOVE")
+						return
+					}
 					karel.row++;
 				}
 				else if (karel.facing == "R"){
+					if(world[karel.row][karel.column + 1] == "W" || karel.column == world.lenght - 1){
+						alert("Kill me because MOVE")
+						return
+					}
 					karel.column++;
 				}
 				else{
+					if(world[karel.row][karel.column - 1] == "W" || karel.column == 0){
+						alert("Kill me because MOVE")
+						return
+					}
 					karel.column--;
 				}
 
@@ -54,19 +69,33 @@ while(InterCode[i] != instructions.TURNOFF){
 				else if(karel.facing == "D"){
 					karel.facing = "R";
 				}
-				else if(karel.facing == "R"){
+				else{
 					karel.facing = "U";
 				}
 				i++;
 				break;
 		case instructions.PICKBEEPER:
-				if(world[karel.row][karel.column] == "B"){
+				if(!isNaN(world[karel.row][karel.column]) && world[karel.row][karel.column]){
+					if(Number(world[karel.row][karel.column]) - 1 == 0){
+						world[karel.row][karel.column] = "";
+					}
+					else{
+						var n = Number(world[karel.row][karel.column]) - 1;
+						world[karel.row][karel.column] = n.toString();
+					}
 					karel.beepers++;
-					world[karel.row][karel.column] =="";
+					world[karel.row][karel.column] == "";
 				}
 				else{
+					alert("Kill me because of PICKBEEPER")
 					return;
 				}
+				i++;
+				break;
+		// case instructions.PUTBEEPER:
+		// 		if(karel.beepers > 0 && ){
+
+		// 		}
 		default:
 
 

@@ -32,7 +32,7 @@ var MAX_LENGHT_IDENTIFICADOR = 25,
     'TURNLEFT' : 29,
     'TURNOFF' : 30,
     'PICKBEEPER' : 31,
-    'PUTBEEPER' : 32
+    'PUTBEEPER' : 32,
     };
 
 var SymbolTable = [];
@@ -51,7 +51,7 @@ function require(requiredToken){
 }
 
 function requireN(){
-    return  aTokensInput[currentToken++]; //falta
+    return  !isNaN(aTokensInput[currentToken]); 
 }
 
 function read(requiredToken){

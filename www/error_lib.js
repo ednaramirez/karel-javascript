@@ -4,7 +4,8 @@ var error_table = ["Missing left brace",
                   "Reserved word error",
                   "Missing left parenthesis",
                   "Undefined function",
-                  "Missing conditional"];
+                  "Missing conditional",
+                  "Iterate value is not a number"];
 
 function showErrorMessage(indexMessage){
   if(error_table[indexMessage-1]){

@@ -249,7 +249,9 @@ function if_expression()
   if ( require("if") ) {
     InterCode[ InterCodeIndex++ ] = instructions.IF;
     if ( require("(") ) {
+
       conditional();
+
       if ( require(")") ) {
         InterCode[ InterCodeIndex++ ] = instructions.JMP;
         PosX_jmptrue = InterCodeIndex++;
@@ -387,16 +389,23 @@ function elseif( PosX_jmptrue )
 
 
 
-//<iterate expression> ::= "iterate" "(" <number> "," "{" <body> "}"
+//<iterate expression> ::= "iterate" "(" <number> ")" "{" <body> "}"
 
-  function iterate_expression(){
-    if(require("iterate")){
-      InterCode[ InterCodeIndex++ ] = instructions.ITERATE;
-      if(require("(")){
-        //requireN();
+function iterate_expression(){
+  var iterate_position;
+  var number;
+  if(require("iterate")){
+    iterate_position = InterCodeIndex;
+    InterCode[ InterCodeIndex++ ] = instructions.ITERATE;
+    if(require("(")){
+      if(requireN()){
+        number =  parseInt(aTokensInput[currentToken++]);
         if(require(")")){
           if(require("{")){
             body();
+            InterCode[ InterCodeIndex++ ] = instructions.JMP_COND;
+            InterCode[ InterCodeIndex++ ] = iterate_position;
+            InterCode[ InterCodeIndex++ ] = number;
             if(require("}")){
             }
             else{
@@ -412,17 +421,21 @@ function elseif( PosX_jmptrue )
         }
         else{
           showErrorMessage(2);
-
         }
       }
       else{
-        showErrorMessage(5);
+        showErrorMessage(8);
+
       }
     }
     else{
-      showErrorMessage(4);
+      showErrorMessage(5);
     }
   }
+  else{
+    showErrorMessage(4);
+  }
+}
 
 
 
@@ -436,19 +449,26 @@ function conditional(){
 		}
 		if (read_simple_condition()) {
 			currentToken++;
-			if (read("&&")){
-				currentToken-=1;
-				and_condition();
-			}
-			else if (read("||")) {
+
+      if (read("&&")){
         currentToken-=1;
+        and_condition();
+      }
+      else if (read("||")) {
+        currentToken-=1;
+
         or_condition();
       }
-      currentToken--;
-      if (!require_simple_condition()) {
-        showErrorMessage(5);
+      else{
+        currentToken--;
+        require_simple_condition();
+        currentToken++;
+
+
       }
-    }else{
+
+    }
+    else{
      showErrorMessage(5);
    }
 	// }while ((read("!") || read("||") || read("&&") || read_simple_condition()))
@@ -456,39 +476,50 @@ function conditional(){
 
 function or_condition(){
 	InterCode [InterCodeIndex++] = instructions.OR;
-	if (require_simple_condition()){
-		if(require("||")){
-			if(!require_simple_condition()){
-				showErrorMessage(5);
-			}
-		}
-		else{
-			showErrorMessage(2);
-		}
-	}
-	else{
-		showErrorMessage(5);
-	}
+  if (require_simple_condition()){
+   currentToken++;
+   if(require("||")){
+     if(require_simple_condition()){
+       currentToken++;
+      return
+    }
+    else{
+      showErrorMessage(5 );  
+    }
+  }
+  else{
+   showErrorMessage(2);
+ }
+}
+else{
+  showErrorMessage(5);
+}
 }
 
 function and_condition(){
 	InterCode [InterCodeIndex++] = instructions.AND;
 	if (require_simple_condition()){
+     currentToken++;
 		if(require("&&")){
-			if(!require_simple_condition()){
-				showErrorMessage(5);
+			if(require_simple_condition()){
+         currentToken++;
+				return
 			}
-		}
-		else{
-			showErrorMessage(2);
-		}
-	}
-	else{
-		showErrorMessage(5);
-	}
+      else{
+        showErrorMessage(5);
+      }
+    }
+    else{
+     showErrorMessage(2);
+   }
+ }
+ else{
+  showErrorMessage(5);
+}
 }
 
 function read_simple_condition(){
+
 	return (read("frontIsClear") ||
    read("frontIsBlocked") ||
    read("leftIsClear") ||
@@ -511,25 +542,81 @@ function read_simple_condition(){
 }
 
 function require_simple_condition(){
-	return (require("frontIsClear") ||
-   require("frontIsBlocked") ||
-   require("leftIsClear") ||
-   require("leftIsBlocked") ||
-   require("rightIsClear") ||
-   require("rightIsBlocked") ||
-   require("nextToABeeper") ||
-   require("notNextToABeeper") ||
-   require("anyBeepersInBeeperBag") ||
-   require("noBeepersInBeeperBag") ||
-   require("facingNorth") ||
-   require("facingSouth") ||
-   require("facingEast") ||
-   require("facingWest") ||
-   require("notFacingNorth") ||
-   require("notFacingSouth") ||
-   require("notFacingEast") ||
-   require("notFacingWest")
-   );
+
+  if(read("frontIsClear")){
+    InterCode[InterCodeIndex++] = 8;
+    return true;  
+  }
+  else if(read("frontIsBlocked")){
+    InterCode[InterCodeIndex++] = 9;
+    return true;  
+  }
+  else if(read("leftIsClear")){
+    InterCode[InterCodeIndex++] = 10;
+    return true;  
+  }
+  else if(read("leftIsBlocked")){
+    InterCode[InterCodeIndex++] = 11;
+    return true;  
+  }
+  else if(read("rightIsClear")){
+    InterCode[InterCodeIndex++] = 12;
+    return true;  
+  }
+  else if(read("rightIsBlocked")){
+    InterCode[InterCodeIndex++] = 13;
+    return true;  
+  }
+  else if(read("nextToABeeper")){
+    InterCode[InterCodeIndex++] = 14;
+    return true;  
+  }
+  else if(read("notNextToABeeper")){
+    InterCode[InterCodeIndex++] = 15;
+    return true;  
+  }
+  else if(read("anyBeepersInBeeperBag")){
+    InterCode[InterCodeIndex++] = 16;
+    return true;  
+  }
+  else if(read("noBeepersInBeeperBag")){
+    InterCode[InterCodeIndex++] = 17;
+    return true;  
+  }
+  else if(read("facingNorth")){
+    InterCode[InterCodeIndex++] = 18;
+    return true;  
+  }
+  else if(read("facingSouth")){
+
+    InterCode[InterCodeIndex++] = 19;
+    return true;  
+  }
+  else if(read("facingEast")){
+    InterCode[InterCodeIndex++] = 20;
+    return true;  
+  }
+  else if(read("facingWest")){
+    InterCode[InterCodeIndex++] = 21;
+    return true;  
+  }
+  else if(read("notFacingNorth")){
+    InterCode[InterCodeIndex++] = 22;
+    return true;  
+  }
+  else if(read("notFacingSouth")){
+    InterCode[InterCodeIndex++] = 23;
+    return true; 
+  }
+  else if(read("notFacingEast")){
+    InterCode[InterCodeIndex++] = 24;
+    return true;  
+  }
+  else if(read("notFacingWest")){
+    InterCode[InterCodeIndex++] = 25;
+    return true;  
+  }
+
 }
 /*function conditional()
 {
