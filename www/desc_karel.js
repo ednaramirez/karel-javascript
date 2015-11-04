@@ -194,35 +194,35 @@ function name_of_function()
     "turnleft" |
     "putbeeper"
     */
-    function official_function()
-    {
-      if ( read("move")){
-        require("move");   
-        InterCode[ InterCodeIndex++ ] = instructions.MOVE;
+  function official_function()
+  {
+    if ( read("move")){
+      require("move");
+      InterCode[ InterCodeIndex++ ] = instructions.MOVE;
 
 
-      }
-      else if(read("turnoff")){
-        require("turnoff");
-        InterCode[ InterCodeIndex++ ] = instructions.TURNOFF;
-
-      }
-      else if(read("pickbeeper")) {
-        require("pickbeeper");
-        InterCode[ InterCodeIndex++ ] = instructions.PICKBEEPER;
-
-      }
-      else if(read("turnleft")){
-        require("turnleft");
-        InterCode[ InterCodeIndex++ ] = instructions.TURNLEFT;
-
-      }
-      else{
-        require("putbeeper");
-        InterCode[ InterCodeIndex++ ] = instructions.PUTBEEBER;
-
-      }
     }
+    else if(read("turnoff")){
+      require("turnoff");
+      InterCode[ InterCodeIndex++ ] = instructions.TURNOFF;
+
+    }
+    else if(read("pickbeeper")) {
+      require("pickbeeper");
+      InterCode[ InterCodeIndex++ ] = instructions.PICKBEEPER;
+
+    }
+    else if(read("turnleft")){
+      require("turnleft");
+      InterCode[ InterCodeIndex++ ] = instructions.TURNLEFT;
+
+    }
+    else{
+      require("putbeeper");
+      InterCode[ InterCodeIndex++ ] = instructions.PUTBEEBER;
+
+    }
+  }
 
 //<customer function> ::= <string without spaces>
 function customer_function()
@@ -484,7 +484,7 @@ function or_condition(){
       return
     }
     else{
-      showErrorMessage(5 );  
+      showErrorMessage(5 );
     }
   }
   else{
@@ -498,6 +498,7 @@ else{
 
 function and_condition(){
 	InterCode [InterCodeIndex++] = instructions.AND;
+
 	if (require_simple_condition()){
      currentToken++;
 		if(require("&&")){
@@ -540,81 +541,90 @@ function read_simple_condition(){
    read("notFacingWest")
    );
 }
-
+function translate(instruction){
+  string = "";
+  for(var i = 0; i<instruction.length;i++){
+    if(instruction[i]>='A' && instruction[i]<='Z'){
+      string+='_';
+    }
+    string += instruction[i].toUpperCase();
+  }
+  return string;
+}
 function require_simple_condition(){
 
   if(read("frontIsClear")){
     InterCode[InterCodeIndex++] = 8;
-    return true;  
+    return true;
   }
   else if(read("frontIsBlocked")){
     InterCode[InterCodeIndex++] = 9;
-    return true;  
+    return true;
   }
   else if(read("leftIsClear")){
     InterCode[InterCodeIndex++] = 10;
-    return true;  
+    return true;
   }
   else if(read("leftIsBlocked")){
     InterCode[InterCodeIndex++] = 11;
-    return true;  
+    return true;
   }
   else if(read("rightIsClear")){
     InterCode[InterCodeIndex++] = 12;
-    return true;  
+    return true;
   }
   else if(read("rightIsBlocked")){
     InterCode[InterCodeIndex++] = 13;
-    return true;  
+    return true;
   }
   else if(read("nextToABeeper")){
     InterCode[InterCodeIndex++] = 14;
-    return true;  
+    return true;
   }
   else if(read("notNextToABeeper")){
     InterCode[InterCodeIndex++] = 15;
-    return true;  
+    return true;
   }
   else if(read("anyBeepersInBeeperBag")){
     InterCode[InterCodeIndex++] = 16;
-    return true;  
+    return true;
   }
   else if(read("noBeepersInBeeperBag")){
     InterCode[InterCodeIndex++] = 17;
-    return true;  
+    return true;
   }
   else if(read("facingNorth")){
     InterCode[InterCodeIndex++] = 18;
-    return true;  
+    return true;
   }
   else if(read("facingSouth")){
 
     InterCode[InterCodeIndex++] = 19;
-    return true;  
+    return true;
   }
   else if(read("facingEast")){
     InterCode[InterCodeIndex++] = 20;
-    return true;  
+    return true;
   }
   else if(read("facingWest")){
     InterCode[InterCodeIndex++] = 21;
-    return true;  
+    return true;
   }
   else if(read("notFacingNorth")){
     InterCode[InterCodeIndex++] = 22;
-    return true;  
+    return true;
   }
   else if(read("notFacingSouth")){
     InterCode[InterCodeIndex++] = 23;
-    return true; 
+    return true;
   }
   else if(read("notFacingEast")){
     InterCode[InterCodeIndex++] = 24;
-    return true;  
+    return true;
   }
   else if(read("notFacingWest")){
     InterCode[InterCodeIndex++] = 25;
-    return true;  
+    return true;
   }
 
 }

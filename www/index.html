@@ -1,58 +1,69 @@
-<script src="meta_karel.js"></script>
-<script src="desc_karel.js"></script>
-<script src="error_lib.js"></script>
-<script src="semantico.js"></script>
-<script type="text/javascript">
-	var aTokensInput =
-		[
-			"class",
-			"program",
-			"{",
-			"program",
-			"(",
-			")",
-			"{",
-			"if",
-			"(",
-			"facingSouth",
-			"||",
-			"facingNorth",
-			")",
-			"{",
-			"move",
-			"(",
-			")",
-			"}",
-			"else",
-			"{",
-			 "turnleft",
-			 "(",
-			 ")",
-			"}",
-			// "move",
-			// "(",
-			// ")",
-			// "move",
-			// "(",
-			// ")",
-			// "turnleft",
-			// "(",
-			// ")",
-			// "turnleft",
-			// "(",
-			// ")",
-			// "turnleft",
-			// "(",
-			// ")",
-			"turnoff",
-			"(",
-			")",
-			"}",
-			"}"
-		],
-	currentToken = 0;
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Maze3D</title>
+    <style>
+    body {
+        color: #ffffff;
+        font-family:Monospace;
+        font-size:13px;
+        text-align:center;
+        font-weight: bold;
 
-	program();
-	//execute();
+        background-color: #000000;
+        margin: 0px;
+        overflow: hidden;
+        cursor: none;
+    }
+    ul {
+        list-style: none;
+    }
 
-</script>
+    </style>
+</head>
+<body>
+
+    <script src="three.min.js"></script>
+    <script src="walls.js"></script>
+    <script src="meta_karel.js"></script>
+    <script src="desc_karel.js"></script>
+    <script src="error_lib.js"></script>
+    <script src="semantico.js"></script>
+    <script>
+			init();
+			var aTokensInput =
+	      [
+	        "class",
+	        "program",
+	        "{",
+	        "program",
+	        "(",
+	        ")",
+	        "{",
+          "move",
+	        "(",
+	        ")",
+          "move",
+	        "(",
+	        ")",
+	        "turnleft",
+	        "(",
+	        ")",
+          "move",
+	        "(",
+	        ")",
+	        "turnoff",
+	        "(",
+	        ")",
+	        "}",
+	        "}"
+	      ],
+    currentToken = 0;
+
+    program();
+    execute();
+
+    </script>
+</body>
+</html>
