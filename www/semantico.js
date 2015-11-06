@@ -342,10 +342,75 @@ while(InterCode[i] != instructions.TURNOFF){
 					return;
 				}
 				break;
-		// case instructions.PUTBEEPER:
-		// 		if(karel.beepers > 0 && ){
+	
+		//CASES FOR FACING
+		case instructions.FACING_NORTH:
+			if(facingIndex==0){
+				return true;
+			}
+			else{
+				return false;
+			}
+			break;
+		case instructions.FACING_WEST:
+			if(facingIndex==1){
+				return true;
+			}
+			else{
+				return false;
+			}
+			break;
+		case instructions.FACING_SOUTH:
+			if(facingIndex==2){
+				return true;
+			}
+			else{
+				return false;
+			}
+			break;
+		case instructions.FACING_RIGHT:
+			if(facingIndex==3){
+				return true;
+			}
+			else{
+				return false;
+			}
+			break;
 
-		// 		}
+		//CASES FOR NOT FACING
+		case instructions.NOT_FACING_NORTH:
+			if(facingIndex!=0){
+				return true;
+			}
+			else{
+				return false;
+			}
+			break;
+		case instructions.NOT_FACING_WEST:
+			if(facingIndex!=1){
+				return true;
+			}
+			else{
+				return false;
+			}
+			break;
+		case instructions.NOT_FACING_SOUTH:
+			if(facingIndex!=2){
+				return true;
+			}
+			else{
+				return false;
+			}
+			break;
+		case instructions.NOT_FACING_RIGHT:
+			if(facingIndex!=3){
+				return true;
+			}
+			else{
+				return false;
+			}
+			break;
+
 		default:
 
 
