@@ -206,7 +206,7 @@ var rotate = function(){
 	karel.rotation.y += Math.PI / 2;
 }
 var move = function (){
-	karel.translateX(maze.cellSize/2);
+	karel.translateX(maze.cellSize);
 	checkCollide();
 }
 function checkCollide(){
@@ -263,66 +263,24 @@ var world = [
 function execute(){
 //alert("Karel is in: row " + karel2.row + " column " + karel2.column);
 
-var i=0, duration = 0, durationDelta = 1000;
+var i=0, duration = 0, durationDelta = 1000,cond=0;
+var karePos = [{x:1 , z:2}];
+
 
 
 while(InterCode[i] != instructions.TURNOFF){
-	console.log(InterCode[i]);
 	duration += durationDelta;
 	switch(InterCode[i]){
+
 		case instructions.MOVE:
 
 				setTimeout(move,duration);
-				/*if(karel.facing == "U"){
-					if(world[karel.row - 1][karel.column] == "W" || karel.row == 0){
-						alert("Kill me because MOVE")
-						return
-					}
-					karel.row--;
-
-				}
-				else if(karel.facing == "D"){
-					if(world[karel.row + 1][karel.column] == "W" || karel.row == world.lenght - 1){
-						alert("Kill me because MOVE")
-						return
-					}
-					karel.row++;
-				}
-				else if (karel.facing == "R"){
-					if(world[karel.row][karel.column + 1] == "W" || karel.column == world.lenght - 1){
-						alert("Kill me because MOVE")
-						return
-					}
-					karel.column++;
-				}
-				else{
-					if(world[karel.row][karel.column - 1] == "W" || karel.column == 0){
-						alert("Kill me because MOVE")
-						return
-					}
-					karel.column--;
-				}
-
-
-				alert("Karel is in: row " + karel.row + " column " + karel.column);*/
+				
 
 				break;
 
 		case instructions.TURNLEFT:
-				/*if(karel.facing == "U"){
-					karel.facing = "L";
-				}
-				else if(karel.facing == "L"){
-					karel.facing = "D";
-				}
-				else if(karel.facing == "D"){
-					karel.facing = "R";
-				}
-				else{
-					karel.facing = "U";
-				}
-				*/
-				setTimeout(rotate,duration);
+			tTimeout(rotate,duration);
 
 				break;
 		case instructions.PICKBEEPER:
@@ -346,70 +304,58 @@ while(InterCode[i] != instructions.TURNOFF){
 		//CASES FOR FACING
 		case instructions.FACING_NORTH:
 			if(facingIndex==0){
-				return true;
+				cond++;
 			}
-			else{
-				return false;
-			}
+		
 			break;
 		case instructions.FACING_WEST:
 			if(facingIndex==1){
-				return true;
+				cond++;
 			}
-			else{
-				return false;
-			}
+			
 			break;
 		case instructions.FACING_SOUTH:
 			if(facingIndex==2){
-				return true;
+				cond++;
 			}
-			else{
-				return false;
-			}
+			
 			break;
 		case instructions.FACING_RIGHT:
 			if(facingIndex==3){
-				return true;
+				cond++;
 			}
-			else{
-				return false;
-			}
+		
 			break;
 
 		//CASES FOR NOT FACING
 		case instructions.NOT_FACING_NORTH:
 			if(facingIndex!=0){
-				return true;
+				cond++;
 			}
-			else{
-				return false;
-			}
+			
 			break;
 		case instructions.NOT_FACING_WEST:
 			if(facingIndex!=1){
-				return true;
+				cond++;
 			}
-			else{
-				return false;
-			}
+			
 			break;
 		case instructions.NOT_FACING_SOUTH:
 			if(facingIndex!=2){
-				return true;
+				cond++;
 			}
-			else{
-				return false;
-			}
+			
 			break;
 		case instructions.NOT_FACING_RIGHT:
 			if(facingIndex!=3){
-				return true;
-			}
-			else{
-				return false;
-			}
+				cond++;
+				}
+			
 			break;
+
+		//CASES FOR CLEAR
+		case instructions.FRONT_IS_CLEAR:
+
 
 		default:
 
