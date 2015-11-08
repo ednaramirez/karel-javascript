@@ -339,23 +339,29 @@ while(InterCode[i] != instructions.TURNOFF){
 
 			checkedPos=hashCheck.FRONT[facing[facingIndex]];
 			if(!(world[karelPosY+checkedPos[0]][karelPosX+checkedPos[1]]=="W")){
-				cond++;
-
+				ifStack.push(1);
 			}
+			else{ifStack.push(0);}
+
+			
 
 
 			break;
 		case instructions.FRONT_IS_BLOCKED:
 			checkedPos=hashCheck.FRONT[facing[facingIndex]];
 			if((world[karelPosY+checkedPos[0]][karelPosX+checkedPos[1]]=="W")){
-				cond++;
+				ifStack.push(1);
+			}
+			else{ifStack.push(0);
 
 			}
 			break;
 		case instructions.LEFT_IS_CLEAR:
 			checkedPos=hashCheck.LEFT[facing[facingIndex]];
 			if(!(world[karelPosY+checkedPos[0]][karelPosX+checkedPos[1]]=="W")){
-				cond++;
+				ifStack.push(1);
+			}
+			else{ifStack.push(0);
 
 			}
 			
@@ -363,7 +369,9 @@ while(InterCode[i] != instructions.TURNOFF){
 		case instructions.LEFT_IS_BLOCKED:
 			checkedPos=hashCheck.LEFT[facing[facingIndex]];
 			if((world[karelPosY+checkedPos[0]][karelPosX+checkedPos[1]]=="W")){
-				cond++;
+				ifStack.push(1);
+			}
+			else{ifStack.push(0);
 
 			}
 			
@@ -371,7 +379,9 @@ while(InterCode[i] != instructions.TURNOFF){
 		case instructions.RIGHT_IS_CLEAR:
 			checkedPos=hashCheck.RIGHT[facing[facingIndex]];
 			if(!(world[karelPosY+checkedPos[0]][karelPosX+checkedPos[1]]=="W")){
-				cond++;
+				ifStack.push(1);
+			}
+			else{ifStack.push(0);
 
 			}
 			
@@ -379,7 +389,9 @@ while(InterCode[i] != instructions.TURNOFF){
 		case instructions.RIGHT_IS_BLOCKED:
 			checkedPos=hashCheck.RIGHT[facing[facingIndex]];
 			if((world[karelPosY+checkedPos[0]][karelPosX+checkedPos[1]]=="W")){
-				cond++;
+				ifStack.push(1);
+			}
+			else{ifStack.push(0);
 
 			}
 			
@@ -387,7 +399,9 @@ while(InterCode[i] != instructions.TURNOFF){
 		case instructions.BACK_IS_CLEAR:
 			checkedPos=hashCheck.BACK[facing[facingIndex]];
 			if(!(world[karelPosY+checkedPos[0]][karelPosX+checkedPos[1]]=="W")){
-				cond++;
+				ifStack.push(1);
+			}
+			else{ifStack.push(0);
 
 			}
 			
@@ -395,7 +409,9 @@ while(InterCode[i] != instructions.TURNOFF){
 		case instructions.BACK_IS_CLEAR:
 			checkedPos=hashCheck.BACK[facing[facingIndex]];
 			if(!(world[karelPosY+checkedPos[0]][karelPosX+checkedPos[1]]=="W")){
-				cond++;
+				ifStack.push(1);
+			}
+			else{ifStack.push(0);
 
 			}
 			
@@ -403,12 +419,16 @@ while(InterCode[i] != instructions.TURNOFF){
 		//CASES FOR BEEPERS
 		case instructions.ANY_BEEPERS_IN_BEEPER_BAG:
 			if(beeperCount >0){
-				cond++;
+				ifStack.push(1);
+			}
+			else{ifStack.push(0);
 			}
 			break;
 		case instructions.NOT_ANY_BEEPERS_IN_BEEPER_BAG:
 			if(beeperCount == 0){
-				cond++;
+				ifStack.push(1);
+			}
+			else{ifStack.push(0);
 			}
 			break;
 
