@@ -29,9 +29,9 @@ var mouseX = 0,
 		mouseY = 0,
 		mouseZ = 0;
 var world = [
+			['','','','','W'],
+			['','','','2',''],
 			['','','','',''],
-			['','','W','2',''],
-			['','','W','W',''],
 			['','','','',''],
 			['','','','','']
 			];
@@ -84,7 +84,7 @@ function init() {
 		
 
 		karel = new THREE.Mesh(geometrySphere, new THREE.MeshBasicMaterial({map : wallTexture,color: 0x00ff00, wireframe: false}));
-		karel.position.x = 0;
+		karel.position.x = 2;
 		karel.position.z = 0;
 		karelPosX = translateToMatricialX(karel.position.z);
 		karelPosY = translateToMatricialY(karel.position.x);
@@ -245,33 +245,14 @@ var hashCheck = {
 		"RIGHT": [-1,0]
 	}
 }
-<<<<<<< HEAD
+
 
 var checkedPos;
+
 function execute(){
-//alert("Karel is in: row " + karel2.row + " column " + karel2.column);
-
-var i=0, duration = 0, durationDelta = 1000,cond=0;
-
-=======
-var world = [
-			['','','','',''],
-			['','','W','2',''],
-			['','','W','W',''],
-			['','','','',''],
-			['','','','','']
-			];
-
 var ifStack = [];
-function execute(){
-//alert("Karel is in: row " + karel2.row + " column " + karel2.column);
 
 var i=0, duration = 0, durationDelta = 1000;
-var karePos = [{x:1 , z:2}];
-
-var flagOR, flagNOT, flagAND;
-// var ifStack = [];
->>>>>>> origin/master
 
 while(InterCode[i] != instructions.TURNOFF){
 	duration += durationDelta/16;
@@ -287,38 +268,10 @@ while(InterCode[i] != instructions.TURNOFF){
 				break;
 
 		case instructions.TURNLEFT:
-<<<<<<< HEAD
-			setTimeout(rotate,duration);
-
+			//setTimeout(rotate,duration);
+				rotate();
 				break;
-		/*case instructions.PICKBEEPER:
-				if(!isNaN(world[karel.row][karel.column]) && world[karel.row][karel.column]){
-					if(Number(world[karel.row][karel.column]) - 1 == 0){
-						world[karel.row][karel.column] = "";
-=======
-			// setTimeout(rotate,duration);
-			// duration += durationDelta;
-			rotate();
-
-				break;
-		case instructions.PICKBEEPER:
-				if(!isNaN(world[karel2.row][karel2.column]) && world[karel2.row][karel2.column]){
-					if(Number(world[karel2.row][karel2.column]) - 1 == 0){
-						world[karel2.row][karel2.column] = "";
->>>>>>> origin/master
-					}
-					else{
-						var n = Number(world[karel2.row][karel2.column]) - 1;
-						world[karel2.row][karel2.column] = n.toString();
-					}
-					karel2.beepers++;
-					world[karel2.row][karel2.column] == "";
-				}
-				else{
-					// alert("Kill me because of PICKBEEPER")
-					return;
-				}
-				break;*/
+		
 	
 		//CASES FOR FACING
 		case instructions.FACING_NORTH:
@@ -382,7 +335,7 @@ while(InterCode[i] != instructions.TURNOFF){
 
 		//CASES FOR CLEAR AND BLOCKED
 		case instructions.FRONT_IS_CLEAR:
-<<<<<<< HEAD
+
 			checkedPos=hashCheck.FRONT[facing[facingIndex]];
 			if(!(world[karelPosY+checkedPos[0]][karelPosX+checkedPos[1]]=="W")){
 				cond++;
@@ -440,7 +393,7 @@ while(InterCode[i] != instructions.TURNOFF){
 			break;
 		case instructions.BACK_IS_CLEAR:
 			checkedPos=hashCheck.BACK[facing[facingIndex]];
-			if(!world[karelPosY+checkedPos[0]][karelPosX+checkedPos[1]]=="W")){
+			if(!(world[karelPosY+checkedPos[0]][karelPosX+checkedPos[1]]=="W")){
 				cond++;
 
 			}
@@ -457,9 +410,6 @@ while(InterCode[i] != instructions.TURNOFF){
 				cond++;
 			}
 			break;
-=======
-				ifStack.push(1);
-				break;
 
 		case instructions.JMP:
 				var x;
@@ -519,7 +469,7 @@ while(InterCode[i] != instructions.TURNOFF){
 		case instructions.AND:
 				ifStack.push(InterCode[i]);
 				break;
->>>>>>> origin/master
+
 		default:
 				alert("Unknown command" + InterCode[i]);
 
@@ -529,5 +479,5 @@ while(InterCode[i] != instructions.TURNOFF){
 	i++;
 
 }
-
 }
+
