@@ -489,7 +489,7 @@ function or_condition(){
       return
     }
     else{
-      showErrorMessage(5 );
+      showErrorMessage(5);
     }
   }
   else{

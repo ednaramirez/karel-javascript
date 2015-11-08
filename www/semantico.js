@@ -245,6 +245,7 @@ var hashCheck = {
 		"RIGHT": [-1,0]
 	}
 }
+<<<<<<< HEAD
 
 var checkedPos;
 function execute(){
@@ -252,19 +253,41 @@ function execute(){
 
 var i=0, duration = 0, durationDelta = 1000,cond=0;
 
+=======
+var world = [
+			['','','','',''],
+			['','','W','2',''],
+			['','','W','W',''],
+			['','','','',''],
+			['','','','','']
+			];
+
+var ifStack = [];
+function execute(){
+//alert("Karel is in: row " + karel2.row + " column " + karel2.column);
+
+var i=0, duration = 0, durationDelta = 1000;
+var karePos = [{x:1 , z:2}];
+
+var flagOR, flagNOT, flagAND;
+// var ifStack = [];
+>>>>>>> origin/master
 
 while(InterCode[i] != instructions.TURNOFF){
-	duration += durationDelta;
+	duration += durationDelta/16;
+	console.log("i: "+i+" @");
 	switch(InterCode[i]){
 
 		case instructions.MOVE:
 
-				setTimeout(move,duration);
-				
+				// setTimeout(move,duration);
+				// duration += durationDelta;
+				move();
 
 				break;
 
 		case instructions.TURNLEFT:
+<<<<<<< HEAD
 			setTimeout(rotate,duration);
 
 				break;
@@ -272,16 +295,27 @@ while(InterCode[i] != instructions.TURNOFF){
 				if(!isNaN(world[karel.row][karel.column]) && world[karel.row][karel.column]){
 					if(Number(world[karel.row][karel.column]) - 1 == 0){
 						world[karel.row][karel.column] = "";
+=======
+			// setTimeout(rotate,duration);
+			// duration += durationDelta;
+			rotate();
+
+				break;
+		case instructions.PICKBEEPER:
+				if(!isNaN(world[karel2.row][karel2.column]) && world[karel2.row][karel2.column]){
+					if(Number(world[karel2.row][karel2.column]) - 1 == 0){
+						world[karel2.row][karel2.column] = "";
+>>>>>>> origin/master
 					}
 					else{
-						var n = Number(world[karel.row][karel.column]) - 1;
-						world[karel.row][karel.column] = n.toString();
+						var n = Number(world[karel2.row][karel2.column]) - 1;
+						world[karel2.row][karel2.column] = n.toString();
 					}
-					karel.beepers++;
-					world[karel.row][karel.column] == "";
+					karel2.beepers++;
+					world[karel2.row][karel2.column] == "";
 				}
 				else{
-					alert("Kill me because of PICKBEEPER")
+					// alert("Kill me because of PICKBEEPER")
 					return;
 				}
 				break;*/
@@ -289,57 +323,66 @@ while(InterCode[i] != instructions.TURNOFF){
 		//CASES FOR FACING
 		case instructions.FACING_NORTH:
 			if(facingIndex==0){
-				cond++;
+				ifStack.push(1);
 			}
+			else{ifStack.push(0);}
 		
 			break;
 		case instructions.FACING_WEST:
 			if(facingIndex==1){
-				cond++;
+				ifStack.push(1);
 			}
+			else{ifStack.push(0);}
 			
 			break;
 		case instructions.FACING_SOUTH:
 			if(facingIndex==2){
-				cond++;
+				ifStack.push(1);
 			}
+			else{ifStack.push(0);}
 			
 			break;
-		case instructions.FACING_RIGHT:
+		case instructions.FACING_EAST:
 			if(facingIndex==3){
-				cond++;
+				ifStack.push(1);
 			}
+			else{ifStack.push(0);}
 		
 			break;
 
 		//CASES FOR NOT FACING
 		case instructions.NOT_FACING_NORTH:
 			if(facingIndex!=0){
-				cond++;
+				ifStack.push(1);
 			}
+			else{ifStack.push(0);}
 			
 			break;
 		case instructions.NOT_FACING_WEST:
 			if(facingIndex!=1){
-				cond++;
+				ifStack.push(1);
 			}
+			else{ifStack.push(0);}
 			
 			break;
 		case instructions.NOT_FACING_SOUTH:
 			if(facingIndex!=2){
-				cond++;
+				ifStack.push(1);
 			}
+			else{ifStack.push(0);}
 			
 			break;
 		case instructions.NOT_FACING_EAST:
 			if(facingIndex!=3){
-				cond++;
-				}
+				ifStack.push(1);
+			}
+			else{ifStack.push(0);}
 			
 			break;
 
 		//CASES FOR CLEAR AND BLOCKED
 		case instructions.FRONT_IS_CLEAR:
+<<<<<<< HEAD
 			checkedPos=hashCheck.FRONT[facing[facingIndex]];
 			if(!(world[karelPosY+checkedPos[0]][karelPosX+checkedPos[1]]=="W")){
 				cond++;
@@ -414,13 +457,77 @@ while(InterCode[i] != instructions.TURNOFF){
 				cond++;
 			}
 			break;
+=======
+				ifStack.push(1);
+				break;
+
+		case instructions.JMP:
+				var x;
+				var result;
+				var cond=0;
+				console.log(ifStack);
+				while(ifStack.length != 0){
+					x = ifStack[ifStack.length-1];
+					ifStack.splice(ifStack.length-1,1);
+					console.log(x + " | " + ifStack);
+					console.log("Cond: "+cond)
+					if(x < 2){
+						cond += x;
+					}
+					if(x == instructions.NOT){
+						 cond = !cond;
+					}
+					console.log("Cond: "+cond)
+					if(x == instructions.AND){
+						if(cond == 2){
+							cond = 1;
+						}
+						else{
+							cond = 0;
+						}
+					}
+					if(x == instructions.OR){
+						if(cond > 0){
+							cond = 1;
+						}
+						else{
+							cond = 0;
+						}
+					}
+					if(x == 4){
+						ifStack = [];
+					}
+				}
+				if(cond){
+					i++;
+					console.log("GO!");
+				}else{
+					i = InterCode[i+1] - 1;
+					console.log("NVM");
+				}
+				// cond = 0;
+				break;
+		case instructions.IF:
+				ifStack.push(InterCode[i]);
+				break;
+		case instructions.NOT:
+				ifStack.push(InterCode[i]);
+				break;
+		case instructions.OR:
+				ifStack.push(InterCode[i]);
+				break;
+		case instructions.AND:
+				ifStack.push(InterCode[i]);
+				break;
+>>>>>>> origin/master
 		default:
+				alert("Unknown command" + InterCode[i]);
 
 
 	}
+	console.log("i: "+i+" InterCode: "+InterCode[i]);
 	i++;
 
 }
-
 
 }
