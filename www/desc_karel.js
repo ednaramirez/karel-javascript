@@ -336,7 +336,7 @@ function elseif( PosX_jmptrue )
       if ( require("(") )
       {
         conditional();
-        if ( require(",") )
+        if ( require(")") )
         {
           InterCode[ InterCodeIndex++ ] = instructions.JMP;
           PosX_jmptrue = InterCodeIndex++;

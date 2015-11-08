@@ -28,17 +28,23 @@ var camera,
 var mouseX = 0,
 		mouseY = 0,
 		mouseZ = 0;
-
-var maze = {width: 10, large:10, cellSize:500};
+var world = [
+			['','','','',''],
+			['','','W','2',''],
+			['','','W','W',''],
+			['','','','',''],
+			['','','','','']
+			];
+var maze = {width: world.length, large:world.length, cellSize:500};
 
 var angleY=0;
 var angleX=0;
 
 var windowHalfX = window.innerWidth / 2;
 var windowHalfY = window.innerHeight / 2;
-
 var posInitial = {x:1, z:8};
-var ray;
+var karelPosX, karelPosY;
+
 
 window.wallGeometries = [];
 
@@ -57,7 +63,7 @@ function init() {
 		geometrySphere = new THREE.SphereGeometry(maze.cellSize/2, 16, 16);
 		material = new THREE.MeshBasicMaterial({color: 0x00FF00, wireframe: true, side: THREE.DoubleSide});
 		geometryPlane = new THREE.CubeGeometry(maze.width*maze.cellSize, maze.large*maze.cellSize,20);
-		geometryPlaneBasic = new THREE.CubeGeometry(maze.cellSize, maze.cellSize, 20);
+		geometryPlaneBasic = new THREE.CubeGeometry(maze.cellSize, maze.cellSize, maze.cellSize);
 
 
 		var texture = THREE.ImageUtils.loadTexture('textures/floor5b.jpg', {}, function(){
@@ -75,13 +81,13 @@ function init() {
 		wallTexture.wrapT = THREE.RepeatWrapping;
 		wallTexture.needsUpdate = true;
 
-		sphere = new THREE.Mesh(geometrySphere, new THREE.MeshBasicMaterial({map: new THREE.ImageUtils.loadTexture('textures/fire_texture.jpg')}));
-		sphere.position.z = 2000;
-		sphere.position.x = 1000;
+		
 
 		karel = new THREE.Mesh(geometrySphere, new THREE.MeshBasicMaterial({map : wallTexture,color: 0x00ff00, wireframe: false}));
-		karel.position.x = maze.cellSize*-4;
-		karel.position.z = maze.cellSize*4;
+		karel.position.x = 0;
+		karel.position.z = 0;
+		karelPosX = translateToMatricialX(karel.position.z);
+		karelPosY = translateToMatricialY(karel.position.x);
 
 
 		plane2 = new THREE.Mesh(geometryPlane, material);
@@ -93,62 +99,27 @@ function init() {
 		var wall;
 		var wallMaterial = new THREE.MeshBasicMaterial({ map : wallTexture, doubleSided: true,side: THREE.DoubleSide });
 
-		for(var i=0; i<maze.width; i ++){
-				wall = new THREE.Mesh(geometryPlaneBasic, wallMaterial);
-				wall.position.z = maze.large/2*maze.cellSize;
-				wall.position.y = 0;
-				wall.position.x = (i-maze.width/2)*maze.cellSize+maze.cellSize/2;
-				scene.add(wall);
-				wallGeometries.push(wall);
-				wall = new THREE.Mesh(geometryPlaneBasic, wallMaterial);
-				wall.position.z = -maze.large/2*maze.cellSize;
-				wall.position.y = 0;
-				wall.position.x = (i-maze.width/2)*maze.cellSize+maze.cellSize/2;
-				scene.add(wall);
-				wallGeometries.push(wall);
-		}
-		for(var i=0; i<maze.large; i ++){
-				wall = new THREE.Mesh(geometryPlaneBasic, wallMaterial);
-				wall.position.x = maze.width/2*maze.cellSize;
-				wall.rotation.y= Math.PI/2;
-				wall.position.y = 0;
-				wall.position.z = (i-maze.large/2)*maze.cellSize+maze.cellSize/2;
-				scene.add(wall);
-				wallGeometries.push(wall);
-				wall = new THREE.Mesh(geometryPlaneBasic, wallMaterial);
-				wall.position.x = -maze.width/2*maze.cellSize;
-				wall.rotation.y= Math.PI/2;
-				wall.position.y = 0;
-				wall.position.z = (i-maze.large/2)*maze.cellSize+maze.cellSize/2;
-				scene.add(wall);
-				wallGeometries.push(wall);
-		}
 
 		var offsizeX=0;
 		var offsizeZ=0;
 
-		for(var i = 0; i<walls.length; i++){
-				wallData = walls[i];
-				wall = new THREE.Mesh(geometryPlaneBasic, wallMaterial);
-				if(wallData.orientation=='front'){
-						offsizeX=-250;
-						offsizeZ=-maze.cellSize;
-				}else if(wallData.orientation=='left'){
-						offsizeX=-250;
-						offsizeZ=0;
-				}else if(wallData.orientation=='left'){
-						offsizeX=-maze.cellSize;
-						offsizeZ=-250;
-				}else if(wallData.orientation=='right'){
-						offsizeX=0;
-						offsizeZ=-250;
+		for(var i = 0; i<world.length; i++){
+			for(var j = 0; j<world.length; j++){
+				if(world[i][j]=='W'){
+					wall = new THREE.Mesh(geometryPlaneBasic, wallMaterial);
+					wall.position.x = translateToCartesianX(j)*maze.cellSize;
+					wall.position.z =  translateToCartesianY(i)*maze.cellSize;
+
+					scene.add(wall);
+			
 				}
-				wall.position.x = (wallData.x-maze.width/2)*maze.cellSize+offsizeX;
-				wall.rotation.y= wallData.orientation=='left'||wallData.orientation=='right'?Math.PI/2:0;
-				wall.position.y = 0;
-				wall.position.z = (wallData.z-maze.large/2)*maze.cellSize+offsizeZ;
-				scene.add(wall);
-				wallGeometries.push(wall);
+				if(parseInt(world[i][j])>0){
+					sphere = new THREE.Mesh(geometrySphere, new THREE.MeshBasicMaterial({map: new THREE.ImageUtils.loadTexture('textures/fire_texture.jpg')}));
+					sphere.position.x = translateToCartesianX(j)*maze.cellSize;
+					sphere.position.z = translateToCartesianY(i)*maze.cellSize;
+					scene.add(sphere);
+				}
+			}
 		}
 		//wall.rotation.x = -Math.PI/2;
 
@@ -172,21 +143,21 @@ function init() {
 
 };
 
-function onDocumentMouseMove(e) {
-		/*difference = mouseX-e.clientX;
-		angleX-=incrementoX*difference;
+function translateToCartesianY(position){
+	return maze.width-1-position-(Math.floor(maze.width/2));
+}
+function translateToCartesianX(position){
+	return position - (Math.floor(maze.width/2));
+}
+function translateToMatricialY(position){
+	return maze.width-1-Math.round(position/maze.cellSize)-(Math.floor(maze.width/2));
+}
+function translateToMatricialX(position){
+	//console.log(Math.round(position/maze.cellSize));
+	//console.log((Math.floor(maze.width/2)));
+	return (Math.floor(maze.width/2)) + Math.round(position/maze.cellSize);
+}
 
-		mouseX = e.clientX;
-		if(mouseX<=windowHalfX-100&&difference>0){
-				angleX-=incrementoX*5;
-		}
-		if(mouseX>=windowHalfX+100&&difference<0){
-				angleX+=incrementoX*5;
-		}
-		//x movement ok
-		e.preventDefault();
-		*/
-};
 function onDocumentKeyDown(e){
 		var keyCode = e.which||e.keyCode;
 		if(keyCode == 87){
@@ -207,7 +178,9 @@ var rotate = function(){
 }
 var move = function (){
 	karel.translateX(maze.cellSize);
-	checkCollide();
+	karelPosX = translateToMatricialX(karel.position.z);
+	karelPosY = translateToMatricialY(karel.position.x);
+	
 }
 function checkCollide(){
 	ray = new THREE.Raycaster();
@@ -245,27 +218,39 @@ function animate() {
 
 };
 
-var karel2 = {
-	"column": 1,
-	"row": 2,
-	"beepers": 0, //number of beepers
-	"facing": 'R' //Up:U Down:D Left:L Right:R
+var beeperCount=0;;
+var hashCheck = {
+	"FRONT": {
+		"FRONT": [-1,0],
+		"BACK": [1,0],
+		"LEFT": [0,-1],
+		"RIGHT": [0,1]
+	},
+	"BACK": {
+		"FRONT": [1,0],
+		"BACK": [-1,0],
+		"LEFT": [0,1],
+		"RIGHT": [0,-1]
+	},
+	"RIGHT": {
+		"FRONT": [0,1],
+		"BACK": [0,-1],
+		"LEFT": [-1,0],
+		"RIGHT": [1,0]
+	},
+	"LEFT": {
+		"FRONT": [0,-1],
+		"BACK": [0,1],
+		"LEFT": [1,0],
+		"RIGHT": [-1,0]
+	}
 }
-var world = [
-			['','','','',''],
-			['','','W','2',''],
-			['','','W','W',''],
-			['','','','',''],
-			['','','','','']
-			];
 
-
+var checkedPos;
 function execute(){
 //alert("Karel is in: row " + karel2.row + " column " + karel2.column);
 
 var i=0, duration = 0, durationDelta = 1000,cond=0;
-var karePos = [{x:1 , z:2}];
-
 
 
 while(InterCode[i] != instructions.TURNOFF){
@@ -280,10 +265,10 @@ while(InterCode[i] != instructions.TURNOFF){
 				break;
 
 		case instructions.TURNLEFT:
-			tTimeout(rotate,duration);
+			setTimeout(rotate,duration);
 
 				break;
-		case instructions.PICKBEEPER:
+		/*case instructions.PICKBEEPER:
 				if(!isNaN(world[karel.row][karel.column]) && world[karel.row][karel.column]){
 					if(Number(world[karel.row][karel.column]) - 1 == 0){
 						world[karel.row][karel.column] = "";
@@ -299,7 +284,7 @@ while(InterCode[i] != instructions.TURNOFF){
 					alert("Kill me because of PICKBEEPER")
 					return;
 				}
-				break;
+				break;*/
 	
 		//CASES FOR FACING
 		case instructions.FACING_NORTH:
@@ -346,17 +331,89 @@ while(InterCode[i] != instructions.TURNOFF){
 			}
 			
 			break;
-		case instructions.NOT_FACING_RIGHT:
+		case instructions.NOT_FACING_EAST:
 			if(facingIndex!=3){
 				cond++;
 				}
 			
 			break;
 
-		//CASES FOR CLEAR
+		//CASES FOR CLEAR AND BLOCKED
 		case instructions.FRONT_IS_CLEAR:
+			checkedPos=hashCheck.FRONT[facing[facingIndex]];
+			if(!(world[karelPosY+checkedPos[0]][karelPosX+checkedPos[1]]=="W")){
+				cond++;
+
+			}
 
 
+			break;
+		case instructions.FRONT_IS_BLOCKED:
+			checkedPos=hashCheck.FRONT[facing[facingIndex]];
+			if((world[karelPosY+checkedPos[0]][karelPosX+checkedPos[1]]=="W")){
+				cond++;
+
+			}
+			break;
+		case instructions.LEFT_IS_CLEAR:
+			checkedPos=hashCheck.LEFT[facing[facingIndex]];
+			if(!(world[karelPosY+checkedPos[0]][karelPosX+checkedPos[1]]=="W")){
+				cond++;
+
+			}
+			
+			break;
+		case instructions.LEFT_IS_BLOCKED:
+			checkedPos=hashCheck.LEFT[facing[facingIndex]];
+			if((world[karelPosY+checkedPos[0]][karelPosX+checkedPos[1]]=="W")){
+				cond++;
+
+			}
+			
+			break;	
+		case instructions.RIGHT_IS_CLEAR:
+			checkedPos=hashCheck.RIGHT[facing[facingIndex]];
+			if(!(world[karelPosY+checkedPos[0]][karelPosX+checkedPos[1]]=="W")){
+				cond++;
+
+			}
+			
+			break;
+		case instructions.RIGHT_IS_BLOCKED:
+			checkedPos=hashCheck.RIGHT[facing[facingIndex]];
+			if((world[karelPosY+checkedPos[0]][karelPosX+checkedPos[1]]=="W")){
+				cond++;
+
+			}
+			
+			break;
+		case instructions.BACK_IS_CLEAR:
+			checkedPos=hashCheck.BACK[facing[facingIndex]];
+			if(!(world[karelPosY+checkedPos[0]][karelPosX+checkedPos[1]]=="W")){
+				cond++;
+
+			}
+			
+			break;
+		case instructions.BACK_IS_CLEAR:
+			checkedPos=hashCheck.BACK[facing[facingIndex]];
+			if(!world[karelPosY+checkedPos[0]][karelPosX+checkedPos[1]]=="W")){
+				cond++;
+
+			}
+			
+			break;
+		//CASES FOR BEEPERS
+		case instructions.ANY_BEEPERS_IN_BEEPER_BAG:
+			if(beeperCount >0){
+				cond++;
+			}
+			break;
+		case instructions.NOT_ANY_BEEPERS_IN_BEEPER_BAG:
+			if(beeperCount == 0){
+				cond++;
+			}
+			break;
 		default:
 
 
