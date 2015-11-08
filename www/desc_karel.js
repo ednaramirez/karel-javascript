@@ -336,7 +336,7 @@ function elseif( PosX_jmptrue )
       if ( require("(") )
       {
         conditional();
-        if ( require(",") )
+        if ( require(")") )
         {
           InterCode[ InterCodeIndex++ ] = instructions.JMP;
           PosX_jmptrue = InterCodeIndex++;
@@ -489,7 +489,7 @@ function or_condition(){
       return
     }
     else{
-      showErrorMessage(5 );
+      showErrorMessage(5);
     }
   }
   else{
