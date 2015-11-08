@@ -21,11 +21,19 @@ function program(){
 }
 
 //<functions> ::= <functions prima>
-function functions() {
-  // body...
+function functions() { 
+  function_prima();   
 }
 
+
 //<functions prima> ::= <function> <functions prima> | lambda
+function function_prima(){
+  if ( read("void") )
+  {
+    _function();
+    function_prima();
+  } 
+}
 
 //<main function> ::= "program()" "{" <body> "}"
 function main_function() {
@@ -33,6 +41,8 @@ function main_function() {
     if(require("(")){
       if(require(")")){
         if(require("{")){
+          InterCode[InterCodeIndex++] = instructions.BEGIN;
+          beginProgram = InterCodeIndex;
           body();
           if(!require("}")){
             showErrorMessage(3);
@@ -93,8 +103,9 @@ function _function () {
 
 // <name function> ::= <string without spaces>
 function name_function() {
-  var nameFunction = [];
-  string_without_spaces(nameFunction);
+
+ var  nameFunction=string_without_spaces(nameFunction);
+
   AddNewFunction(nameFunction, InterCodeIndex);
 }
 

@@ -45,6 +45,7 @@ var windowHalfY = window.innerHeight / 2;
 var posInitial = {x:1, z:8};
 var karelPosX, karelPosY;
 
+var beginProgram;
 
 window.wallGeometries = [];
 
@@ -252,7 +253,7 @@ var checkedPos;
 function execute(){
 var ifStack = [];
 
-var i=0, duration = 0, durationDelta = 1000;
+var i=beginProgram, duration = 0, durationDelta = 1000;
 
 while(InterCode[i] != instructions.TURNOFF){
 	duration += durationDelta/16;
@@ -471,7 +472,7 @@ while(InterCode[i] != instructions.TURNOFF){
 				break;
 
 		default:
-				alert("Unknown command" + InterCode[i]);
+				alert("Unknown command " + InterCode[i]);
 
 
 	}
