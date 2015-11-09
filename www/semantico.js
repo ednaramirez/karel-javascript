@@ -45,6 +45,7 @@ var windowHalfY = window.innerHeight / 2;
 var posInitial = {x:1, z:8};
 var karelPosX, karelPosY;
 
+var movementSequence = [];
 var beginProgram;
 
 window.wallGeometries = [];
@@ -85,7 +86,7 @@ function init() {
 		
 
 		karel = new THREE.Mesh(geometrySphere, new THREE.MeshBasicMaterial({map : wallTexture,color: 0x00ff00, wireframe: false}));
-		karel.position.x = 2;
+		karel.position.x = 0;
 		karel.position.z = 0;
 		karelPosX = translateToMatricialX(karel.position.z);
 		karelPosY = translateToMatricialY(karel.position.x);
@@ -172,16 +173,26 @@ function onDocumentKeyDown(e){
 
 var rotate = function(){
 	facingIndex++;
-	if(facingIndex==4){
+	if(facingIndex==4) {
 		facingIndex = 0;
 	}
-	karel.rotation.y += Math.PI / 2;
+	movementSequence.push("rotate");
+	//karel.rotation.y += Math.PI / 2;
 }
 var move = function (){
+	var newPosition = hashCheck['FRONT'][facing[facingIndex]];
+	//karel.translateX(maze.cellSize);
+	karelPosX += newPosition[1];
+	karelPosY += newPosition[0];
+	movementSequence.push("move");
+}
+var rotateAnimation = function(){
+	karel.rotation.y += Math.PI / 2;
+}
+
+var moveAnimation = function(){
+
 	karel.translateX(maze.cellSize);
-	karelPosX = translateToMatricialX(karel.position.z);
-	karelPosY = translateToMatricialY(karel.position.x);
-	
 }
 function checkCollide(){
 	ray = new THREE.Raycaster();
@@ -251,263 +262,255 @@ var hashCheck = {
 var checkedPos;
 
 function execute(){
-var ifStack = [], callStack = [];
+	var ifStack = [], callStack = [];
+	var i=beginProgram;
+	var checkIfClear = function (checkedPos) {
+		if(karelPosY+checkedPos[0]<maze.width
+				&& karelPosX + checkedPos[1]<maze.width
+				&& karelPosY+checkedPos[0]>=0
+				&& karelPosX + checkedPos[1]>=0
+				&& world[karelPosY + checkedPos[0]][karelPosX + checkedPos[1]] != "W") {
+			ifStack.push(1);
 
-var i=beginProgram, duration = 0, durationDelta = 1000;
+		}
+		else{
+			ifStack.push(0);
+		}
+	},
+	checkIfBlocked = function (checkedPos) {
+		if(karelPosY+checkedPos[0]>=maze.width
+			&& karelPosX + checkedPos[1]>=maze.width
+			&& karelPosY+checkedPos[0]<0
+			&& karelPosX + checkedPos[1]<0
+			&& world[karelPosY+checkedPos[0]][karelPosX+checkedPos[1]]=="W"){
+			ifStack.push(1);
+		}
+		else{
+			ifStack.push(0);
+		}
+	};
+	while(InterCode[i] != instructions.TURNOFF){
+		console.log("i: "+i+" @");
+		switch(InterCode[i]){
 
-while(InterCode[i] != instructions.TURNOFF){
-	duration += durationDelta/16;
-	console.log("i: "+i+" @");
-	switch(InterCode[i]){
+			case instructions.MOVE:
 
-		case instructions.MOVE:
+					move();
 
-				// setTimeout(move,duration);
-				// duration += durationDelta;
-				move();
+					break;
 
-				break;
-
-		case instructions.TURNLEFT:
-			//setTimeout(rotate,duration);
-				rotate();
-				break;
-		
-	
-		//CASES FOR FACING
-		case instructions.FACING_NORTH:
-			if(facingIndex==0){
-				ifStack.push(1);
-			}
-			else{ifStack.push(0);}
-		
-			break;
-		case instructions.FACING_WEST:
-			if(facingIndex==1){
-				ifStack.push(1);
-			}
-			else{ifStack.push(0);}
-			
-			break;
-		case instructions.FACING_SOUTH:
-			if(facingIndex==2){
-				ifStack.push(1);
-			}
-			else{ifStack.push(0);}
-			
-			break;
-		case instructions.FACING_EAST:
-			if(facingIndex==3){
-				ifStack.push(1);
-			}
-			else{ifStack.push(0);}
-		
-			break;
-
-		//CASES FOR NOT FACING
-		case instructions.NOT_FACING_NORTH:
-			if(facingIndex!=0){
-				ifStack.push(1);
-			}
-			else{ifStack.push(0);}
-			
-			break;
-		case instructions.NOT_FACING_WEST:
-			if(facingIndex!=1){
-				ifStack.push(1);
-			}
-			else{ifStack.push(0);}
-			
-			break;
-		case instructions.NOT_FACING_SOUTH:
-			if(facingIndex!=2){
-				ifStack.push(1);
-			}
-			else{ifStack.push(0);}
-			
-			break;
-		case instructions.NOT_FACING_EAST:
-			if(facingIndex!=3){
-				ifStack.push(1);
-			}
-			else{ifStack.push(0);}
-			
-			break;
-
-		//CASES FOR CLEAR AND BLOCKED
-		case instructions.FRONT_IS_CLEAR:
-
-			checkedPos=hashCheck.FRONT[facing[facingIndex]];
-			if(!(world[karelPosY+checkedPos[0]][karelPosX+checkedPos[1]]=="W")){
-				ifStack.push(1);
-			}
-			else{ifStack.push(0);}
-
-			
+			case instructions.TURNLEFT:
+					rotate();
+					break;
 
 
-			break;
-		case instructions.FRONT_IS_BLOCKED:
-			checkedPos=hashCheck.FRONT[facing[facingIndex]];
-			if((world[karelPosY+checkedPos[0]][karelPosX+checkedPos[1]]=="W")){
-				ifStack.push(1);
-			}
-			else{ifStack.push(0);
-
-			}
-			break;
-		case instructions.LEFT_IS_CLEAR:
-			checkedPos=hashCheck.LEFT[facing[facingIndex]];
-			if(!(world[karelPosY+checkedPos[0]][karelPosX+checkedPos[1]]=="W")){
-				ifStack.push(1);
-			}
-			else{ifStack.push(0);
-
-			}
-			
-			break;
-		case instructions.LEFT_IS_BLOCKED:
-			checkedPos=hashCheck.LEFT[facing[facingIndex]];
-			if((world[karelPosY+checkedPos[0]][karelPosX+checkedPos[1]]=="W")){
-				ifStack.push(1);
-			}
-			else{ifStack.push(0);
-
-			}
-			
-			break;	
-		case instructions.RIGHT_IS_CLEAR:
-			checkedPos=hashCheck.RIGHT[facing[facingIndex]];
-			if(!(world[karelPosY+checkedPos[0]][karelPosX+checkedPos[1]]=="W")){
-				ifStack.push(1);
-			}
-			else{ifStack.push(0);
-
-			}
-			
-			break;
-		case instructions.RIGHT_IS_BLOCKED:
-			checkedPos=hashCheck.RIGHT[facing[facingIndex]];
-			if((world[karelPosY+checkedPos[0]][karelPosX+checkedPos[1]]=="W")){
-				ifStack.push(1);
-			}
-			else{ifStack.push(0);
-
-			}
-			
-			break;
-		case instructions.BACK_IS_CLEAR:
-			checkedPos=hashCheck.BACK[facing[facingIndex]];
-			if(!(world[karelPosY+checkedPos[0]][karelPosX+checkedPos[1]]=="W")){
-				ifStack.push(1);
-			}
-			else{ifStack.push(0);
-
-			}
-			
-			break;
-		case instructions.BACK_IS_BLOCKED:
-			checkedPos=hashCheck.BACK[facing[facingIndex]];
-			if((world[karelPosY+checkedPos[0]][karelPosX+checkedPos[1]]=="W")){
-				ifStack.push(1);
-			}
-			else{ifStack.push(0);
-
-			}
-			
-			break;
-		//CASES FOR BEEPERS
-		case instructions.ANY_BEEPERS_IN_BEEPER_BAG:
-			if(beeperCount >0){
-				ifStack.push(1);
-			}
-			else{ifStack.push(0);
-			}
-			break;
-		case instructions.NOT_ANY_BEEPERS_IN_BEEPER_BAG:
-			if(beeperCount == 0){
-				ifStack.push(1);
-			}
-			else{ifStack.push(0);
-			}
-			break;
-
-		case instructions.JMP:
-				var x;
-				var result;
-				var cond=0;
-				console.log(ifStack);
-				while(ifStack.length != 0){
-					x = ifStack[ifStack.length-1];
-					ifStack.splice(ifStack.length-1,1);
-					console.log(x + " | " + ifStack);
-					console.log("Cond: "+cond)
-					if(x < 2){
-						cond += x;
-					}
-					if(x == instructions.NOT){
-						 cond = !cond;
-					}
-					console.log("Cond: "+cond)
-					if(x == instructions.AND){
-						if(cond == 2){
-							cond = 1;
-						}
-						else{
-							cond = 0;
-						}
-					}
-					if(x == instructions.OR){
-						if(cond > 0){
-							cond = 1;
-						}
-						else{
-							cond = 0;
-						}
-					}
-					if(x == 4){
-						ifStack = [];
-					}
+			//CASES FOR FACING
+			case instructions.FACING_NORTH:
+				if(facingIndex==0){
+					ifStack.push(1);
 				}
-				if(cond){
-					i++;
-					console.log("GO!");
-				}else{
-					i = InterCode[i+1] - 1;
-					console.log("NVM");
+				else{ifStack.push(0);}
+
+				break;
+			case instructions.FACING_WEST:
+				if(facingIndex==1){
+					ifStack.push(1);
 				}
-				// cond = 0;
+				else{ifStack.push(0);}
+
 				break;
-		case instructions.IF:
-				ifStack.push(InterCode[i]);
+			case instructions.FACING_SOUTH:
+				if(facingIndex==2){
+					ifStack.push(1);
+				}
+				else{ifStack.push(0);}
+
 				break;
-		case instructions.NOT:
-				ifStack.push(InterCode[i]);
-				break;
-		case instructions.OR:
-				ifStack.push(InterCode[i]);
-				break;
-		case instructions.AND:
-				ifStack.push(InterCode[i]);
-				break;
-		case instructions.CALL:
-				callStack.push(i+1);
-				i = InterCode[i+1]-1;
+			case instructions.FACING_EAST:
+				if(facingIndex==3){
+					ifStack.push(1);
+				}
+				else{ifStack.push(0);}
+
 				break;
 
-		case instructions.RET:
-				i = callStack[callStack.length-1];
-				callStack.splice(callStack.length-1,1);
+			//CASES FOR NOT FACING
+			case instructions.NOT_FACING_NORTH:
+				if(facingIndex!=0){
+					ifStack.push(1);
+				}
+				else{ifStack.push(0);}
+
+				break;
+			case instructions.NOT_FACING_WEST:
+				if(facingIndex!=1){
+					ifStack.push(1);
+				}
+				else{ifStack.push(0);}
+
+				break;
+			case instructions.NOT_FACING_SOUTH:
+				if(facingIndex!=2){
+					ifStack.push(1);
+				}
+				else{ifStack.push(0);}
+
+				break;
+			case instructions.NOT_FACING_EAST:
+				if(facingIndex!=3){
+					ifStack.push(1);
+				}
+				else{ifStack.push(0);}
+
 				break;
 
-		default:
-				alert("Unknown command " + InterCode[i]);
+			//CASES FOR CLEAR AND BLOCKED
+			case instructions.FRONT_IS_CLEAR:
+				checkedPos=hashCheck.FRONT[facing[facingIndex]];
+				checkIfClear(checkedPos);
+				break;
+			case instructions.FRONT_IS_BLOCKED:
+				checkedPos=hashCheck.FRONT[facing[facingIndex]];
+				checkIfBlocked(checkedPos);
 
+				break;
+			case instructions.LEFT_IS_CLEAR:
+				checkedPos=hashCheck.LEFT[facing[facingIndex]];
+				checkIfClear(checkedPos);
+
+				break;
+			case instructions.LEFT_IS_BLOCKED:
+				checkedPos=hashCheck.LEFT[facing[facingIndex]];
+				checkIfBlocked(checkedPos);
+
+				break;
+			case instructions.RIGHT_IS_CLEAR:
+				checkedPos=hashCheck.RIGHT[facing[facingIndex]];
+				checkIfClear(checkedPos);
+
+				break;
+			case instructions.RIGHT_IS_BLOCKED:
+				checkedPos=hashCheck.RIGHT[facing[facingIndex]];
+				checkIfBlocked(checkedPos);
+
+				break;
+			case instructions.BACK_IS_CLEAR:
+				checkedPos=hashCheck.BACK[facing[facingIndex]];
+				checkIfClear(checkedPos);
+
+				break;
+			case instructions.BACK_IS_BLOCKED:
+				checkedPos=hashCheck.BACK[facing[facingIndex]];
+				checkIfBlocked(checkedPos);
+
+				break;
+			//CASES FOR BEEPERS
+			case instructions.ANY_BEEPERS_IN_BEEPER_BAG:
+				if(beeperCount >0){
+					ifStack.push(1);
+				}
+				else{ifStack.push(0);
+				}
+				break;
+			case instructions.NOT_ANY_BEEPERS_IN_BEEPER_BAG:
+				if(beeperCount == 0){
+					ifStack.push(1);
+				}
+				else{ifStack.push(0);
+				}
+				break;
+
+			case instructions.JMP:
+					var x;
+					var result;
+					var cond=0;
+					console.log(ifStack);
+					while(ifStack.length != 0){
+						x = ifStack[ifStack.length-1];
+						ifStack.splice(ifStack.length-1,1);
+						console.log(x + " | " + ifStack);
+						console.log("Cond: "+cond)
+						if(x < 2){
+							cond += x;
+						}
+						if(x == instructions.NOT){
+							 cond = !cond;
+						}
+						console.log("Cond: "+cond)
+						if(x == instructions.AND){
+							if(cond == 2){
+								cond = 1;
+							}
+							else{
+								cond = 0;
+							}
+						}
+						if(x == instructions.OR){
+							if(cond > 0){
+								cond = 1;
+							}
+							else{
+								cond = 0;
+							}
+						}
+						if(x == 4){
+							ifStack = [];
+						}
+					}
+					if(cond){
+						i++;
+						console.log("GO!");
+					}else{
+						i = InterCode[i+1] - 1;
+						console.log("NVM");
+					}
+					// cond = 0;
+					break;
+			case instructions.IF:
+					ifStack.push(InterCode[i]);
+					break;
+			case instructions.NOT:
+					ifStack.push(InterCode[i]);
+					break;
+			case instructions.OR:
+					ifStack.push(InterCode[i]);
+					break;
+			case instructions.AND:
+					ifStack.push(InterCode[i]);
+					break;
+			case instructions.CALL:
+					callStack.push(i+1);
+					i = InterCode[i+1]-1;
+					break;
+
+			case instructions.RET:
+					i = callStack[callStack.length-1];
+					callStack.splice(callStack.length-1,1);
+					break;
+
+			default:
+					alert("Unknown command " + InterCode[i]);
+
+
+		}
+		console.log("i: "+i+" InterCode: "+InterCode[i]);
+		i++;
 
 	}
-	console.log("i: "+i+" InterCode: "+InterCode[i]);
-	i++;
+
+	var duration = 0, deltaDuration=500;
+	for(var p=0;p<movementSequence.length;p++){
+		duration+=deltaDuration;
+		console.log(duration);
+		switch(movementSequence[p]){
+			case 'move':
+				setTimeout(moveAnimation,duration);
+				break;
+			case 'rotate':
+				setTimeout(rotateAnimation,duration);
+				break;
+		}
+	}
+
 
 }
-}
-
