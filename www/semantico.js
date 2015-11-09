@@ -251,7 +251,7 @@ var hashCheck = {
 var checkedPos;
 
 function execute(){
-var ifStack = [];
+var ifStack = [], callStack = [];
 
 var i=beginProgram, duration = 0, durationDelta = 1000;
 
@@ -406,9 +406,9 @@ while(InterCode[i] != instructions.TURNOFF){
 			}
 			
 			break;
-		case instructions.BACK_IS_CLEAR:
+		case instructions.BACK_IS_BLOCKED:
 			checkedPos=hashCheck.BACK[facing[facingIndex]];
-			if(!(world[karelPosY+checkedPos[0]][karelPosX+checkedPos[1]]=="W")){
+			if((world[karelPosY+checkedPos[0]][karelPosX+checkedPos[1]]=="W")){
 				ifStack.push(1);
 			}
 			else{ifStack.push(0);
@@ -489,6 +489,15 @@ while(InterCode[i] != instructions.TURNOFF){
 				break;
 		case instructions.AND:
 				ifStack.push(InterCode[i]);
+				break;
+		case instructions.CALL:
+				callStack.push(i+1);
+				i = InterCode[i+1]-1;
+				break;
+
+		case instructions.RET:
+				i = callStack[callStack.length-1];
+				callStack.splice(callStack.length-1,1);
 				break;
 
 		default:
