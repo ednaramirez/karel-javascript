@@ -33,16 +33,18 @@ var MAX_LENGHT_IDENTIFICADOR = 25,
     'TURNOFF' : 30,
     'PICKBEEPER' : 31,
     'PUTBEEPER' : 32,
+    'BEGIN' : 33,
+
     };
 
-var SymbolTable = [];
+var SymbolTable = []
 
 var InterCode = [];
 var InterCodeIndex =0;
 var lastSymbol = 0;
 
 function string_without_spaces(nameFunction){
-		nameFunction = aTokensInput[currentToken];
+		return nameFunction = aTokensInput[currentToken++];
 
 }
 
@@ -67,6 +69,8 @@ function findStartPointOfFunction(nameFunction){
 }
 
 function AddNewFunction(requiredToken){
-	SymbolTable.push({identificador:requiredToken});
+    console.log("requiredToken: ")
+    console.log(requiredToken);
+	SymbolTable.push({'identificador':requiredToken});
 	lastSymbol++;
 }

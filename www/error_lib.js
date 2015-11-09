@@ -1,11 +1,11 @@
-var error_table = ["Missing left brace",
-                  "Missing right parenthesis",
-                  "Missing right brace",
-                  "Reserved word error",
-                  "Missing left parenthesis",
-                  "Undefined function",
-                  "Missing conditional",
-                  "Iterate value is not a number"];
+var error_table = ["DescError: Missing left brace",
+                   "DescError: Missing right parenthesis",
+                   "DescError: Missing right brace",
+                   "DescError: Reserved word error",
+                   "DescError: Missing left parenthesis",
+                   "DescError: Undefined function",
+                   "DescError: Missing conditional",
+                   "DescError: Iterate value is not a number"];
 
 function showErrorMessage(indexMessage){
   if(error_table[indexMessage-1]){

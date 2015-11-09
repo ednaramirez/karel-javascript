@@ -30,34 +30,73 @@
     <script src="desc_karel.js"></script>
     <script src="error_lib.js"></script>
     <script src="semantico.js"></script>
-    <script>
+    <script>    
 			init();
 			var aTokensInput =
 	      [
-	        "class",
-	        "program",
-	        "{",
-	        "program",
-	        "(",
-	        ")",
-	        "{",
-          "move",
-	        "(",
-	        ")",
-          "move",
-	        "(",
-	        ")",
-	        "turnleft",
-	        "(",
-	        ")",
-          "move",
-	        "(",
-	        ")",
-	        "turnoff",
-	        "(",
-	        ")",
-	        "}",
-	        "}"
+	       "class",
+            "program",
+            "{",
+            "void",
+            "coso",
+            "(",
+            ")",
+            "{",
+            "move",
+            "(",
+            ")",
+            "}",
+            "program",
+            "(",
+            ")",
+            "{",
+            //PROGRAM TOOLBOX 
+            // "(",
+            // ")",
+
+            // "if",
+            // "(",
+            // "", // Condition
+            // ")",
+            // "{",
+            // "move", // Action
+            // "(",
+            // ")",
+            // "}",
+            // "else", // Else
+            // "{",
+            // "", // Action
+            // "(",
+            // ")",
+            // "}",
+
+            // "while",
+            // "(",
+            // "", // Condition
+            // ")",
+            // "{",
+            // "", // Action
+            // "(",
+            // ")",
+            // "}",
+
+            //PROGRAM TOOLBOX END
+
+            "while",
+            "(",
+            "frontIsClear", //Condition
+            ")",
+            "{",
+            "move", //Action
+            "(",
+            ")",
+            "}",
+
+            "turnoff",
+            "(",
+            ")",
+            "}",
+            "}"
 	      ],
     currentToken = 0;
 

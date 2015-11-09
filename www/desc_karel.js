@@ -21,11 +21,19 @@ function program(){
 }
 
 //<functions> ::= <functions prima>
-function functions() {
-  // body...
+function functions() { 
+  function_prima();   
 }
 
+
 //<functions prima> ::= <function> <functions prima> | lambda
+function function_prima(){
+  if ( read("void") )
+  {
+    _function();
+    function_prima();
+  } 
+}
 
 //<main function> ::= "program()" "{" <body> "}"
 function main_function() {
@@ -33,6 +41,8 @@ function main_function() {
     if(require("(")){
       if(require(")")){
         if(require("{")){
+          InterCode[InterCodeIndex++] = instructions.BEGIN;
+          beginProgram = InterCodeIndex;
           body();
           if(!require("}")){
             showErrorMessage(3);
@@ -93,8 +103,9 @@ function _function () {
 
 // <name function> ::= <string without spaces>
 function name_function() {
-  var nameFunction = [];
-  string_without_spaces(nameFunction);
+
+ var  nameFunction=string_without_spaces(nameFunction);
+
   AddNewFunction(nameFunction, InterCodeIndex);
 }
 
@@ -336,7 +347,7 @@ function elseif( PosX_jmptrue )
       if ( require("(") )
       {
         conditional();
-        if ( require(",") )
+        if ( require(")") )
         {
           InterCode[ InterCodeIndex++ ] = instructions.JMP;
           PosX_jmptrue = InterCodeIndex++;
@@ -395,17 +406,19 @@ function iterate_expression(){
   var iterate_position;
   var number;
   if(require("iterate")){
-    iterate_position = InterCodeIndex;
-    InterCode[ InterCodeIndex++ ] = instructions.ITERATE;
+    iterate_position = currentToken;
     if(require("(")){
       if(requireN()){
         number =  parseInt(aTokensInput[currentToken++]);
         if(require(")")){
           if(require("{")){
-            body();
-            InterCode[ InterCodeIndex++ ] = instructions.JMP_COND;
-            InterCode[ InterCodeIndex++ ] = iterate_position;
-            InterCode[ InterCodeIndex++ ] = number;
+            for(var i=0; i < number ; i++){
+               body();
+               var outToken = currentToken;
+               currentToken = iterate_position;
+            }
+            currentToken = outToken;
+          
             if(require("}")){
             }
             else{
@@ -456,13 +469,13 @@ function conditional(){
       }
       else if (read("||")) {
         currentToken-=1;
-
+ 
         or_condition();
       }
       else{
         currentToken--;
         require_simple_condition();
-        currentToken++;
+      
 
 
       }
@@ -475,16 +488,19 @@ function conditional(){
 }
 
 function or_condition(){
-	InterCode [InterCodeIndex++] = instructions.OR;
+	
+  InterCode [InterCodeIndex++] = instructions.OR;
+
+
   if (require_simple_condition()){
-   currentToken++;
+
    if(require("||")){
+
      if(require_simple_condition()){
-       currentToken++;
       return
     }
     else{
-      showErrorMessage(5 );
+      showErrorMessage(5);
     }
   }
   else{
@@ -500,10 +516,8 @@ function and_condition(){
 	InterCode [InterCodeIndex++] = instructions.AND;
 
 	if (require_simple_condition()){
-     currentToken++;
 		if(require("&&")){
 			if(require_simple_condition()){
-         currentToken++;
 				return
 			}
       else{
@@ -553,79 +567,16 @@ function translate(instruction){
 }
 function require_simple_condition(){
 
-  if(read("frontIsClear")){
-    InterCode[InterCodeIndex++] = 8;
-    return true;
-  }
-  else if(read("frontIsBlocked")){
-    InterCode[InterCodeIndex++] = 9;
-    return true;
-  }
-  else if(read("leftIsClear")){
-    InterCode[InterCodeIndex++] = 10;
-    return true;
-  }
-  else if(read("leftIsBlocked")){
-    InterCode[InterCodeIndex++] = 11;
-    return true;
-  }
-  else if(read("rightIsClear")){
-    InterCode[InterCodeIndex++] = 12;
-    return true;
-  }
-  else if(read("rightIsBlocked")){
-    InterCode[InterCodeIndex++] = 13;
-    return true;
-  }
-  else if(read("nextToABeeper")){
-    InterCode[InterCodeIndex++] = 14;
-    return true;
-  }
-  else if(read("notNextToABeeper")){
-    InterCode[InterCodeIndex++] = 15;
-    return true;
-  }
-  else if(read("anyBeepersInBeeperBag")){
-    InterCode[InterCodeIndex++] = 16;
-    return true;
-  }
-  else if(read("noBeepersInBeeperBag")){
-    InterCode[InterCodeIndex++] = 17;
-    return true;
-  }
-  else if(read("facingNorth")){
-    InterCode[InterCodeIndex++] = 18;
-    return true;
-  }
-  else if(read("facingSouth")){
+  
+  if(read_simple_condition()){
 
-    InterCode[InterCodeIndex++] = 19;
+    InterCode[InterCodeIndex++]=instructions[translate(aTokensInput[currentToken++])]
     return true;
   }
-  else if(read("facingEast")){
-    InterCode[InterCodeIndex++] = 20;
-    return true;
+  else{
+    return false;
   }
-  else if(read("facingWest")){
-    InterCode[InterCodeIndex++] = 21;
-    return true;
-  }
-  else if(read("notFacingNorth")){
-    InterCode[InterCodeIndex++] = 22;
-    return true;
-  }
-  else if(read("notFacingSouth")){
-    InterCode[InterCodeIndex++] = 23;
-    return true;
-  }
-  else if(read("notFacingEast")){
-    InterCode[InterCodeIndex++] = 24;
-    return true;
-  }
-  else if(read("notFacingWest")){
-    InterCode[InterCodeIndex++] = 25;
-    return true;
-  }
+ 
 
 }
 /*function conditional()
