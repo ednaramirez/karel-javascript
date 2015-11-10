@@ -30,8 +30,8 @@ var mouseX = 0,
 		mouseZ = 0;
 var world = [
 			['','','','','W',''],
-			['','','','','W',''],
-			['','','','','','3'],
+			['','','','','W','2'],
+			['','','','','','1'],
 			['','','','W','',''],
 			['','','','','',''],
 			['','','','','','']
@@ -49,7 +49,8 @@ var karelPosX, karelPosY;
 var movementSequence = [];
 var beginProgram;
 
-window.wallGeometries = [];
+window.wallGeometries = []
+var beeperArray = [];
 
 function init() {
 
@@ -101,8 +102,6 @@ function init() {
 
 		var wall;
 		var wallMaterial = new THREE.MeshBasicMaterial({ map : wallTexture, doubleSided: true,side: THREE.DoubleSide });
-
-
 		var offsizeX=0;
 		var offsizeZ=0;
 
@@ -117,9 +116,11 @@ function init() {
 			
 				}
 				if(parseInt(world[i][j])>0){
+					
 					sphere = new THREE.Mesh(geometrySphere, new THREE.MeshBasicMaterial({map: new THREE.ImageUtils.loadTexture('textures/fire_texture.jpg')}));
 					sphere.position.z = translateToCartesianX(j)*maze.cellSize;
 					sphere.position.x = translateToCartesianY(i)*maze.cellSize;
+					sphere.name= i.toString() + j.toString();	
 					scene.add(sphere);
 				}
 			}
@@ -187,6 +188,12 @@ var move = function (){
 	karelPosY += newPosition[0];
 	movementSequence.push("move");
 }
+var pickbeeper = function (){
+	movementSequence.push("pickbeeper");
+}
+var putbeeper = function (){
+	movementSequence.push("putbeeper");
+}
 var rotateAnimation = function(){
 	karel.rotation.y += Math.PI / 2;
 }
@@ -194,6 +201,20 @@ var rotateAnimation = function(){
 var moveAnimation = function(){
 
 	karel.translateX(maze.cellSize);
+}
+var pickbeeperAnimate = function(){
+	var sceneObject = scene.getObjectByName(karelPosY.toString() + karelPosX.toString());
+	scene.remove(sceneObject);
+	
+}
+var putbeeperAnimate = function(x,y){
+	sphere = new THREE.Mesh(geometrySphere, new THREE.MeshBasicMaterial({map: new THREE.ImageUtils.loadTexture('textures/fire_texture.jpg')}));
+	sphere.position.z = translateToCartesianX(karelPosX)*maze.cellSize;
+	sphere.position.x = translateToCartesianY(karelPosY)*maze.cellSize;
+	sphere.name= karelPosY.toString() + karelPosX.toString();	
+	scene.add(sphere);
+	
+	
 }
 function checkCollide(){
 	ray = new THREE.Raycaster();
@@ -492,11 +513,35 @@ function execute(){
 					break;
 
 			case instructions.PICKBEEPER:
-					if(parseInt(world[karelPosY][karelPosX]) > 0){
-						alert("yay");
-
-
+				var beepers = parseInt(world[karelPosY][karelPosX]);
+			
+					if(beepers > 0){
+						world[karelPosY][karelPosX] = (beepers - 1).toString() ;
+						beeperCount++;	
 					} 
+					if(world[karelPosY][karelPosX] == "0"){
+						pickbeeper();
+					}
+					
+					break;
+			case instructions.PUTBEEPER:
+
+					var beepers = parseInt(world[karelPosY][karelPosX]);
+					if(isNaN(beepers)){
+						world[karelPosY][karelPosX] = 1
+						putbeeper(karelPosY,karelPosX);
+					}
+					else{
+					world[karelPosY][karelPosX] = (beepers  +1).toString() ;
+					}	
+					beeperCount--;	
+					
+
+					
+					
+
+					
+					break;
 
 			default:
 					alert("Unknown command " + InterCode[i]);
@@ -518,6 +563,12 @@ function execute(){
 				break;
 			case 'rotate':
 				setTimeout(rotateAnimation,duration);
+				break;
+			case 'pickbeeper':
+				setTimeout(pickbeeperAnimate,duration);	
+				break;
+			case 'putbeeper':
+				setTimeout(putbeeperAnimate,duration);	
 				break;
 		}
 	}

@@ -230,7 +230,7 @@ function name_of_function()
     }
     else{
       require("putbeeper");
-      InterCode[ InterCodeIndex++ ] = instructions.PUTBEEBER;
+      InterCode[ InterCodeIndex++ ] = instructions.PUTBEEPER;
 
     }
   }
