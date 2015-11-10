@@ -29,11 +29,12 @@ var mouseX = 0,
 		mouseY = 0,
 		mouseZ = 0;
 var world = [
-			['','','','','W'],
-			['','','','2',''],
-			['','','','',''],
-			['','','','',''],
-			['','','','','']
+			['','','','','W',''],
+			['','','','','W',''],
+			['','','','','','3'],
+			['','','','W','',''],
+			['','','','','',''],
+			['','','','','','']
 			];
 var maze = {width: world.length, large:world.length, cellSize:500};
 
@@ -109,16 +110,16 @@ function init() {
 			for(var j = 0; j<world.length; j++){
 				if(world[i][j]=='W'){
 					wall = new THREE.Mesh(geometryPlaneBasic, wallMaterial);
-					wall.position.x = translateToCartesianX(j)*maze.cellSize;
-					wall.position.z =  translateToCartesianY(i)*maze.cellSize;
+					wall.position.z = translateToCartesianX(j)*maze.cellSize;
+					wall.position.x =  translateToCartesianY(i)*maze.cellSize;
 
 					scene.add(wall);
 			
 				}
 				if(parseInt(world[i][j])>0){
 					sphere = new THREE.Mesh(geometrySphere, new THREE.MeshBasicMaterial({map: new THREE.ImageUtils.loadTexture('textures/fire_texture.jpg')}));
-					sphere.position.x = translateToCartesianX(j)*maze.cellSize;
-					sphere.position.z = translateToCartesianY(i)*maze.cellSize;
+					sphere.position.z = translateToCartesianX(j)*maze.cellSize;
+					sphere.position.x = translateToCartesianY(i)*maze.cellSize;
 					scene.add(sphere);
 				}
 			}
@@ -264,12 +265,12 @@ var checkedPos;
 function execute(){
 	var ifStack = [], callStack = [];
 	var i=beginProgram;
-	var checkIfClear = function (checkedPos) {
-		if(karelPosY+checkedPos[0]<maze.width
-				&& karelPosX + checkedPos[1]<maze.width
-				&& karelPosY+checkedPos[0]>=0
-				&& karelPosX + checkedPos[1]>=0
-				&& world[karelPosY + checkedPos[0]][karelPosX + checkedPos[1]] != "W") {
+	var checkIfClear = function () {
+		if((karelPosY+checkedPos[0])<maze.width
+				&& (karelPosX + checkedPos[1])<maze.width
+				&& (karelPosY+checkedPos[0])>=0
+				&& (karelPosX + checkedPos[1])>=0
+				&& (world[karelPosY + checkedPos[0]][karelPosX + checkedPos[1]] != "W")) {
 			ifStack.push(1);
 
 		}
@@ -366,7 +367,9 @@ function execute(){
 
 			//CASES FOR CLEAR AND BLOCKED
 			case instructions.FRONT_IS_CLEAR:
+				console.log("Checking front is clear")
 				checkedPos=hashCheck.FRONT[facing[facingIndex]];
+				console.log("Row: "+(karelPosY+checkedPos[0])+" column: "+(karelPosX+checkedPos[1]));
 				checkIfClear(checkedPos);
 				break;
 			case instructions.FRONT_IS_BLOCKED:
@@ -487,6 +490,13 @@ function execute(){
 					i = callStack[callStack.length-1];
 					callStack.splice(callStack.length-1,1);
 					break;
+
+			case instructions.PICKBEEPER:
+					if(parseInt(world[karelPosY][karelPosX]) > 0){
+						alert("yay");
+
+
+					} 
 
 			default:
 					alert("Unknown command " + InterCode[i]);

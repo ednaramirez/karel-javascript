@@ -406,12 +406,12 @@ function iterate_expression(){
   var iterate_position;
   var number;
   if(require("iterate")){
-    iterate_position = currentToken;
     if(require("(")){
       if(requireN()){
         number =  parseInt(aTokensInput[currentToken++]);
         if(require(")")){
           if(require("{")){
+             iterate_position = currentToken;
             for(var i=0; i < number ; i++){
                body();
                var outToken = currentToken;
