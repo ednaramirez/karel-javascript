@@ -104,9 +104,8 @@ function _function () {
 // <name function> ::= <string without spaces>
 function name_function() {
 
- var  nameFunction=string_without_spaces(nameFunction);
-
-  AddNewFunction(nameFunction, InterCodeIndex);
+  var nameFunction=string_without_spaces();
+  AddNewFunction(nameFunction);
 }
 
 //<body> ::= <expressions>
@@ -238,11 +237,11 @@ function name_of_function()
 //<customer function> ::= <string without spaces>
 function customer_function()
 {
-  var nameFunction = [];
-  var PosFunctionInCodeInter;
-  string_without_spaces( nameFunction );
-  PosFunctionInCodeInter = findStartPointOfFunction( nameFunction );
-  if ( PosFunctionInCodeInter != 0xFF )
+  var nameFunction = string_without_spaces();
+
+  var PosFunctionInCodeInter = findStartPointOfFunction( nameFunction );
+  console.log("nameFunction "+nameFunction+" PosFunctioninIntercode "+PosFunctionInCodeInter);
+  if ( PosFunctionInCodeInter != -1 )
   {
     InterCode[ InterCodeIndex++ ] = instructions.CALL;
     InterCode[ InterCodeIndex++ ] = PosFunctionInCodeInter;

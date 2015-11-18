@@ -24,13 +24,32 @@
 </head>
 <body>
 
-    <script src="three.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r73/three.js"></script>
+    <script src="MTLLoader.js"></script>
+    <script src="OBJMTLLoader.js"></script>
     <script src="walls.js"></script>
+    <script src="lex_analyzer.js"></script>
     <script src="meta_karel.js"></script>
     <script src="desc_karel.js"></script>
     <script src="error_lib.js"></script>
     <script src="semantico.js"></script>
-    <script>    
+    <script>
+        var code = "class program{" +
+                        "void coso(){" +
+                            "move()" +
+                        "}" +
+                        "program(){" +
+                            "turnleft()" +
+                            "turnleft()" +
+                            "turnleft()" +
+                            "iterate(2){" +
+                                "coso()" +
+                            "}" +
+                            "pickbeeper()" +
+                            "turnoff()" +
+                        "}" +
+                    "}"
+
 			init();
 			var aTokensInput =
 	      [
@@ -112,8 +131,8 @@
             "}",
             "}"
 	      ],
-    currentToken = 0;
-
+        currentToken = 0;
+        aTokensInput = lexAnalyzer(code);
     program();
     execute();
 

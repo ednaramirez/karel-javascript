@@ -43,8 +43,8 @@ var InterCode = [];
 var InterCodeIndex =0;
 var lastSymbol = 0;
 
-function string_without_spaces(nameFunction){
-		return nameFunction = aTokensInput[currentToken++];
+function string_without_spaces(){
+    return aTokensInput[currentToken++];
 
 }
 
@@ -53,7 +53,7 @@ function require(requiredToken){
 }
 
 function requireN(){
-    return  !isNaN(aTokensInput[currentToken]); 
+    return !isNaN(aTokensInput[currentToken]);
 }
 
 function read(requiredToken){
@@ -61,16 +61,17 @@ function read(requiredToken){
 }
 
 function findStartPointOfFunction(nameFunction){
-	for(var i=0; i < lastSymbol && nameFunction==SymbolTable[i].identificador; i++);
-	if(i<lastSymbol){
-		return i;
-	}
-	return 0xff;
+    console.log("Find start of function "+nameFunction)
+    console.log(SymbolTable);
+    if(SymbolTable[nameFunction]!=undefined){
+        return SymbolTable[nameFunction];
+    }
+    return -1;
 }
 
 function AddNewFunction(requiredToken){
     console.log("requiredToken: ")
     console.log(requiredToken);
-	SymbolTable.push({'identificador':requiredToken});
-	lastSymbol++;
+	SymbolTable[requiredToken] = InterCodeIndex;
+    console.log(SymbolTable);
 }

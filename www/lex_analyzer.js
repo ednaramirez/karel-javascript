@@ -1,12 +1,12 @@
 function lexAnalyzer(string){
-	var accepted = [], end, type, tokens[];
+	var accepted = [], end, type, tokens = [];
 
 	for(var i=0;i<string.length;i++){
 		if((string[i]>='a' && string[i]<='z') || (string[i]>='A' && string[i]<='Z')){
 			end = getWord(string,i);
 			type = "Word"
 		}
-		if((string[i]>=0 && string[i]<=9)){
+		if((parseInt(string[i])>=0 && parseInt(string[i])<=9)){
 			end = getNumber(string,i);
 			type = "Number"
 
@@ -21,7 +21,7 @@ function lexAnalyzer(string){
 			type= getType(string[i])
 		}
 		if(end!=-1){
-      tokens.push(string.substring(i,end));
+            tokens.push(string.substring(i,end));
 			accepted.push("("+string.substring(i,end) +"," + type + ")");
 			i = end-1;
 			type= getType(string[i])
@@ -31,7 +31,9 @@ function lexAnalyzer(string){
 
 	}
 
-	console.log(accepted);
+	console.log(tokens);
+
+	return tokens;
 }
 
 function getWord(string, pos){

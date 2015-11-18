@@ -40,6 +40,7 @@ var maze = {width: world.length, large:world.length, cellSize:500};
 
 var angleY=0;
 var angleX=0;
+var cosaFea;
 
 var windowHalfX = window.innerWidth / 2;
 var windowHalfY = window.innerHeight / 2;
@@ -87,11 +88,10 @@ function init() {
 
 		
 
-		karel = new THREE.Mesh(geometrySphere, new THREE.MeshBasicMaterial({map : wallTexture,color: 0x00ff00, wireframe: false}));
-		karel.position.x = 0;
-		karel.position.z = 0;
-		karelPosX = translateToMatricialX(karel.position.z);
-		karelPosY = translateToMatricialY(karel.position.x);
+//		karel = new THREE.Mesh(geometrySphere, new THREE.MeshBasicMaterial({map : wallTexture,color: 0x00ff00, wireframe: false}));
+
+
+
 
 
 		plane2 = new THREE.Mesh(geometryPlane, material);
@@ -126,16 +126,34 @@ function init() {
 			}
 		}
 		//wall.rotation.x = -Math.PI/2;
+		karelPosX = translateToMatricialX(0);
+		karelPosY = translateToMatricialY(0);
+		var loader = new THREE.OBJMTLLoader();
+		loader.load( "android.obj", "android.mtl", function( object ) {
 
+			object.scale.x=object.scale.z=object.scale.y=100;
+			object.traverse( function ( child )
+			{
+				if ( child instanceof THREE.Mesh )
+					child.material.color.setRGB (Math.random(), Math.random(), Math.random());
+			});
 
+			karel = object;
+			karel.rotation.y += Math.PI / 2;
+			karel.position.x = 0;
+			karel.position.z = 0;
+
+			scene.add(karel);
+		} );
 		scene.add(sphere);
-		scene.add(karel);
+
 		scene.add(plane2);
 
 		//addiding some light to the scene
 		pointLight = new THREE.DirectionalLight( 0xffffff );
 		pointLight.position.set( 0, 0, 1 ).normalize();
-
+		var ambientLight = new THREE.AmbientLight(0xffffff);
+		scene.add(ambientLight);
 		scene.add(pointLight);
 
 
@@ -183,10 +201,18 @@ var rotate = function(){
 }
 var move = function (){
 	var newPosition = hashCheck['FRONT'][facing[facingIndex]];
+	if((karelPosY+newPosition[0])<maze.width
+			&& (karelPosX + newPosition[1])<maze.width
+			&& (karelPosY+newPosition[0])>=0
+			&& (karelPosX + newPosition[1])>=0
+			&& (world[karelPosY + newPosition[0]][karelPosX + newPosition[1]] != "W")) {
+		karelPosX += newPosition[1];
+		karelPosY += newPosition[0];
+		movementSequence.push("move");
+
+	}
 	//karel.translateX(maze.cellSize);
-	karelPosX += newPosition[1];
-	karelPosY += newPosition[0];
-	movementSequence.push("move");
+
 }
 var pickbeeper = function (){
 	movementSequence.push("pickbeeper");
@@ -200,7 +226,7 @@ var rotateAnimation = function(){
 
 var moveAnimation = function(){
 
-	karel.translateX(maze.cellSize);
+	karel.translateZ(maze.cellSize);
 }
 var pickbeeperAnimate = function(){
 	var sceneObject = scene.getObjectByName(karelPosY.toString() + karelPosX.toString());
@@ -429,6 +455,25 @@ function execute(){
 
 				break;
 			//CASES FOR BEEPERS
+			case instructions.NEXT_TO_A_BEEPER:
+
+				if(parseInt(world[karelPosY][karelPosX])>0){
+					ifStack.push(1);
+				}
+				else{
+					ifStack.push(0);
+
+				}
+				break;
+			case instructions.NOT_NEXT_TO_A_BEEPER:
+
+				if(!(parseInt(world[karelPosY][karelPosX])>0)){
+					ifStack.push(1);
+				}
+				else{
+					ifStack.push(0);
+				}
+				break;
 			case instructions.ANY_BEEPERS_IN_BEEPER_BAG:
 				if(beeperCount >0){
 					ifStack.push(1);
