@@ -22,7 +22,7 @@ function program(){
 
 //<functions> ::= <functions prima>
 function functions() { 
-  function_prima();   
+  function_prima();
 }
 
 
@@ -41,8 +41,8 @@ function main_function() {
     if(require("(")){
       if(require(")")){
         if(require("{")){
-          InterCode[InterCodeIndex++] = instructions.BEGIN;
-          beginProgram = InterCodeIndex;
+          InterCode[InterCodeIndex[0]++] = instructions.BEGIN;
+          beginProgram = InterCodeIndex[0];
           body();
           if(!require("}")){
             showErrorMessage(3);
@@ -78,7 +78,7 @@ function _function () {
           if(!require("}")){
             showErrorMessage(3);
           }
-          InterCode[InterCodeIndex++] = instructions.RET;
+          InterCode[InterCodeIndex[0]++] = instructions.RET;
         }
         else
         {
@@ -106,7 +106,7 @@ function name_function() {
 
  var  nameFunction=string_without_spaces(nameFunction);
 
-  AddNewFunction(nameFunction, InterCodeIndex);
+  AddNewFunction(nameFunction, InterCodeIndex[0]);
 }
 
 //<body> ::= <expressions>
@@ -154,9 +154,15 @@ function expression()
       {
         iterate_expression();
       }
-      else
-      {
-        call_function();
+      else {
+        if(read("clone")){
+          console.log("desc_karel.js::expression::read a clone");
+          clone_expression();
+        }
+        else
+        {
+          call_function();
+        }
       }
     }
   }
@@ -209,28 +215,28 @@ function name_of_function()
   {
     if ( read("move")){
       require("move");
-      InterCode[ InterCodeIndex++ ] = instructions.MOVE;
+      InterCode[ InterCodeIndex[0]++ ] = instructions.MOVE;
 
 
     }
     else if(read("turnoff")){
       require("turnoff");
-      InterCode[ InterCodeIndex++ ] = instructions.TURNOFF;
+      InterCode[ InterCodeIndex[0]++ ] = instructions.TURNOFF;
 
     }
     else if(read("pickbeeper")) {
       require("pickbeeper");
-      InterCode[ InterCodeIndex++ ] = instructions.PICKBEEPER;
+      InterCode[ InterCodeIndex[0]++ ] = instructions.PICKBEEPER;
 
     }
     else if(read("turnleft")){
       require("turnleft");
-      InterCode[ InterCodeIndex++ ] = instructions.TURNLEFT;
+      InterCode[ InterCodeIndex[0]++ ] = instructions.TURNLEFT;
 
     }
     else{
       require("putbeeper");
-      InterCode[ InterCodeIndex++ ] = instructions.PUTBEEPER;
+      InterCode[ InterCodeIndex[0]++ ] = instructions.PUTBEEPER;
 
     }
   }
@@ -244,8 +250,8 @@ function customer_function()
   PosFunctionInCodeInter = findStartPointOfFunction( nameFunction );
   if ( PosFunctionInCodeInter != 0xFF )
   {
-    InterCode[ InterCodeIndex++ ] = instructions.CALL;
-    InterCode[ InterCodeIndex++ ] = PosFunctionInCodeInter;
+    InterCode[ InterCodeIndex[0]++ ] = instructions.CALL;
+    InterCode[ InterCodeIndex[0]++ ] = PosFunctionInCodeInter;
   }
   else
   {
@@ -258,14 +264,14 @@ function if_expression()
 {
   var PosX_jmptrue= 0;
   if ( require("if") ) {
-    InterCode[ InterCodeIndex++ ] = instructions.IF;
+    InterCode[ InterCodeIndex[0]++ ] = instructions.IF;
     if ( require("(") ) {
 
       conditional();
 
       if ( require(")") ) {
-        InterCode[ InterCodeIndex++ ] = instructions.JMP;
-        PosX_jmptrue = InterCodeIndex++;
+        InterCode[ InterCodeIndex[0]++ ] = instructions.JMP;
+        PosX_jmptrue = InterCodeIndex[0]++;
         if ( require("{") )
         {
           body();
@@ -277,7 +283,7 @@ function if_expression()
             }
             else
             {
-              InterCode[ PosX_jmptrue ] = InterCodeIndex;
+              InterCode[ PosX_jmptrue ] = InterCodeIndex[0];
             }
           }
           else
@@ -312,9 +318,9 @@ function elseif( PosX_jmptrue )
   var PosY_jmpfalse= 0;
   if ( require("else") )
   {
-    InterCode[ InterCodeIndex++ ] = instructions.JMP;
-    PosY_jmpfalse = InterCodeIndex++;
-    InterCode[ PosX_jmptrue ] = InterCodeIndex;
+    InterCode[ InterCodeIndex[0]++ ] = instructions.JMP;
+    PosY_jmpfalse = InterCodeIndex[0]++;
+    InterCode[ PosX_jmptrue ] = InterCodeIndex[0];
     if ( require("{") )
     {
       body();
@@ -322,7 +328,7 @@ function elseif( PosX_jmptrue )
       {
         showErrorMessage(3);
       }
-      InterCode[ PosY_jmpfalse ] = InterCodeIndex;
+      InterCode[ PosY_jmpfalse ] = InterCodeIndex[0];
     }
     else
     {
@@ -342,15 +348,15 @@ function elseif( PosX_jmptrue )
     var PosY_beginWhile;
     if ( require("while") )
     {
-      PosY_beginWhile = InterCodeIndex;
-      InterCode[ InterCodeIndex++ ] = instructions.IF;
+      PosY_beginWhile = InterCodeIndex[0];
+      InterCode[ InterCodeIndex[0]++ ] = instructions.IF;
       if ( require("(") )
       {
         conditional();
         if ( require(")") )
         {
-          InterCode[ InterCodeIndex++ ] = instructions.JMP;
-          PosX_jmptrue = InterCodeIndex++;
+          InterCode[ InterCodeIndex[0]++ ] = instructions.JMP;
+          PosX_jmptrue = InterCodeIndex[0]++;
           if ( require("{") )
           {
             body();
@@ -359,9 +365,9 @@ function elseif( PosX_jmptrue )
               showErrorMessage(3);
             //error de sintaxis, fin de ejecucion
           }
-          InterCode[ InterCodeIndex++ ] = instructions.JMP;
-          InterCode[ InterCodeIndex++ ] = PosY_beginWhile;
-          InterCode[ PosX_jmptrue ] = InterCodeIndex;
+          InterCode[ InterCodeIndex[0]++ ] = instructions.JMP;
+          InterCode[ InterCodeIndex[0]++ ] = PosY_beginWhile;
+          InterCode[ PosX_jmptrue ] = InterCodeIndex[0];
         }
         else
         {
@@ -450,15 +456,50 @@ function iterate_expression(){
   }
 }
 
+function clone_expression(){
+  if(require("clone")){
+    if(require("(")){
+      clone_function();
+      if(!require(")")){
+        showErrorMessage(8);
+      }
+    }
+    else{
+      showErrorMessage(5);
+    }
+  }
+  else{
+    showErrorMessage(4);
+  }
+}
 
+function clone_function()
+{
+  var nameFunction = [];
+  var PosFunctionInCodeInter;
+  string_without_spaces( nameFunction );
+  PosFunctionInCodeInter = findStartPointOfFunction( nameFunction );
+  if ( PosFunctionInCodeInter != 0xFF )
+  {
 
+    InterCode[ InterCodeIndex[0]++ ] = instructions.CLONE;
+    InterCode[ InterCodeIndex[0]++ ] = PosFunctionInCodeInter;
+    InterCode[ InterCodeIndex[0]++ ] = instructions.CLONE_END;
+    cloneCount++;
+    InterCodeIndex[cloneCount] = PosFunctionInCodeInter;
+  }
+  else
+  {
+    showErrorMessage(6);
+  }
+}
 
 //<conditional> ::= <simple condition> | <composed condition>
 function conditional(){
 	// do{
 		if (read("!")) {
 			require("!");
-			InterCode [InterCodeIndex++] = instructions.NOT;
+			InterCode [InterCodeIndex[0]++] = instructions.NOT;
 		}
 		if (read_simple_condition()) {
 			currentToken++;
@@ -489,7 +530,7 @@ function conditional(){
 
 function or_condition(){
 	
-  InterCode [InterCodeIndex++] = instructions.OR;
+  InterCode [InterCodeIndex[0]++] = instructions.OR;
 
 
   if (require_simple_condition()){
@@ -513,7 +554,7 @@ else{
 }
 
 function and_condition(){
-	InterCode [InterCodeIndex++] = instructions.AND;
+	InterCode [InterCodeIndex[0]++] = instructions.AND;
 
 	if (require_simple_condition()){
 		if(require("&&")){
@@ -570,7 +611,7 @@ function require_simple_condition(){
   
   if(read_simple_condition()){
 
-    InterCode[InterCodeIndex++]=instructions[translate(aTokensInput[currentToken++])]
+    InterCode[InterCodeIndex[0]++]=instructions[translate(aTokensInput[currentToken++])]
     return true;
   }
   else{
@@ -586,7 +627,7 @@ function require_simple_condition(){
   if(leerCondicional(&condition))
   {
     exigir(conditionals[condition]);
-    InterCode[InterCodeIndex++] = condition;
+    InterCode[InterCodeIndex[0]++] = condition;
 
     if(leer("&&") || leer("||"))
     {
@@ -595,7 +636,7 @@ function require_simple_condition(){
         if(leerCondicional(&condition))
         {
           exigir(conditionals[condition]);
-          InterCode[InterCodeIndex++] = condition;
+          InterCode[InterCodeIndex[0]++] = condition;
           InterCode[InterCode++] =
         }
         else {

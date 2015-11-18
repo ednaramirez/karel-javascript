@@ -34,13 +34,15 @@ var MAX_LENGHT_IDENTIFICADOR = 25,
     'PICKBEEPER' : 31,
     'PUTBEEPER' : 32,
     'BEGIN' : 33,
-
+    'CLONE' : 34,
+    'CLONE_END' : 35,
     };
 
 var SymbolTable = []
-
 var InterCode = [];
-var InterCodeIndex =0;
+var InterCodeIndex = [];
+InterCodeIndex[0] = 0;
+var cloneCount = 0;
 var lastSymbol = 0;
 
 function string_without_spaces(nameFunction){
