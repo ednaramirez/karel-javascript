@@ -22,7 +22,7 @@ function program(){
 
 //<functions> ::= <functions prima>
 function functions() { 
-  function_prima();   
+  function_prima();
 }
 
 
@@ -153,9 +153,15 @@ function expression()
       {
         iterate_expression();
       }
-      else
-      {
-        call_function();
+      else {
+        if(read("clone")){
+          console.log("desc_karel.js::expression::read a clone");
+          clone_expression();
+        }
+        else
+        {
+          call_function();
+        }
       }
     }
   }
@@ -449,8 +455,43 @@ function iterate_expression(){
   }
 }
 
+function clone_expression(){
+  if(require("clone")){
+    if(require("(")){
+      clone_function();
+      if(!require(")")){
+        showErrorMessage(8);
+      }
+    }
+    else{
+      showErrorMessage(5);
+    }
+  }
+  else{
+    showErrorMessage(4);
+  }
+}
 
+function clone_function()
+{
+  var nameFunction = [];
+  var PosFunctionInCodeInter;
+  string_without_spaces( nameFunction );
+  PosFunctionInCodeInter = findStartPointOfFunction( nameFunction );
+  if ( PosFunctionInCodeInter != 0xFF )
+  {
 
+    InterCode[ InterCodeIndex++ ] = instructions.CLONE;
+    InterCode[ InterCodeIndex++ ] = PosFunctionInCodeInter;
+    InterCode[ InterCodeIndex++ ] = instructions.CLONE_END;
+    cloneCount++;
+    InterCodeIndex[cloneCount] = PosFunctionInCodeInter;
+  }
+  else
+  {
+    showErrorMessage(6);
+  }
+}
 
 //<conditional> ::= <simple condition> | <composed condition>
 function conditional(){

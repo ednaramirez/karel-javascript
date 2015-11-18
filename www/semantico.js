@@ -50,7 +50,7 @@ var karelPosX, karelPosY;
 var movementSequence = [];
 var beginProgram;
 
-window.wallGeometries = []
+window.wallGeometries = [];
 var beeperArray = [];
 
 function init() {
@@ -579,15 +579,16 @@ function execute(){
 					else{
 					world[karelPosY][karelPosX] = (beepers  +1).toString() ;
 					}	
-					beeperCount--;	
-					
-
-					
-					
-
-					
+					beeperCount--;
 					break;
 
+			case instructions.CLONE:
+					console.log("KAGEBUNSHINNOJUTSU!!");
+					i++;
+					break;
+			case instructions.CLONE_END:
+					console.log("Clone Cancel");
+					break;
 			default:
 					alert("Unknown command " + InterCode[i]);
 
