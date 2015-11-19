@@ -38,21 +38,34 @@ var world = [
 			];
 var maze = {width: world.length, large:world.length, cellSize:500};
 
-var angleY=0;
-var angleX=0;
-var cosaFea;
-
-var windowHalfX = window.innerWidth / 2;
-var windowHalfY = window.innerHeight / 2;
-var posInitial = {x:1, z:8};
 var karelPosX, karelPosY;
-
+var karelArr = [];
+var karelStartPosition = [0];
+var currentKarel = 0;
 var movementSequence = [];
 var beginProgram;
 
 window.wallGeometries = [];
 var beeperArray = [];
+function addKarel (){
+	var loader = new THREE.OBJMTLLoader();
+	loader.load( "android.obj", "android.mtl", function( object ) {
 
+		object.scale.x=object.scale.z=object.scale.y=100;
+		object.traverse( function ( child )
+		{
+			if ( child instanceof THREE.Mesh )
+				child.material.color.setRGB (Math.random(), Math.random(), Math.random());
+		});
+
+		karelArr[currentKarel] = object;
+		karelArr[currentKarel].rotation.y += Math.PI / 2;
+		karelArr[currentKarel].position.x = 0;
+		karelArr[currentKarel].position.z = 0;
+
+		scene.add(karelArr[currentKarel++]);
+	} );
+}
 function init() {
 
 		scene = new THREE.Scene();
@@ -86,7 +99,7 @@ function init() {
 		wallTexture.wrapT = THREE.RepeatWrapping;
 		wallTexture.needsUpdate = true;
 
-		
+
 
 //		karel = new THREE.Mesh(geometrySphere, new THREE.MeshBasicMaterial({map : wallTexture,color: 0x00ff00, wireframe: false}));
 
@@ -128,23 +141,8 @@ function init() {
 		//wall.rotation.x = -Math.PI/2;
 		karelPosX = translateToMatricialX(0);
 		karelPosY = translateToMatricialY(0);
-		var loader = new THREE.OBJMTLLoader();
-		loader.load( "android.obj", "android.mtl", function( object ) {
 
-			object.scale.x=object.scale.z=object.scale.y=100;
-			object.traverse( function ( child )
-			{
-				if ( child instanceof THREE.Mesh )
-					child.material.color.setRGB (Math.random(), Math.random(), Math.random());
-			});
-
-			karel = object;
-			karel.rotation.y += Math.PI / 2;
-			karel.position.x = 0;
-			karel.position.z = 0;
-
-			scene.add(karel);
-		} );
+		addKarel();
 		scene.add(sphere);
 
 		scene.add(plane2);
@@ -221,12 +219,12 @@ var putbeeper = function (){
 	movementSequence.push("putbeeper");
 }
 var rotateAnimation = function(){
-	karel.rotation.y += Math.PI / 2;
+	karelArr[0].rotation.y += Math.PI / 2;
 }
 
 var moveAnimation = function(){
 
-	karel.translateZ(maze.cellSize);
+	karelArr[0].translateZ(maze.cellSize);
 }
 var pickbeeperAnimate = function(){
 	var sceneObject = scene.getObjectByName(karelPosY.toString() + karelPosX.toString());
@@ -581,10 +579,9 @@ function execute(){
 					}	
 					beeperCount--;
 					break;
-
 			case instructions.CLONE:
+					karelStartPosition.push(movementSequence.length-1);
 					console.log("KAGEBUNSHINNOJUTSU!!");
-					i++;
 					break;
 			case instructions.CLONE_END:
 					console.log("Clone Cancel");

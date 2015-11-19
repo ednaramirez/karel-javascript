@@ -458,7 +458,13 @@ function iterate_expression(){
 function clone_expression(){
   if(require("clone")){
     if(require("(")){
-      clone_function();
+      InterCode[ InterCodeIndex++ ] = instructions.CLONE;
+      console.log("Current token in clone expression");
+      console.log(aTokensInput[currentToken]);
+      call_function();
+      InterCode[ InterCodeIndex++ ] = instructions.CLONE_END;
+      console.log("Current token in clone expression");
+      console.log(aTokensInput[currentToken]);
       if(!require(")")){
         showErrorMessage(8);
       }
@@ -472,26 +478,6 @@ function clone_expression(){
   }
 }
 
-function clone_function()
-{
-  var nameFunction = [];
-  var PosFunctionInCodeInter;
-  string_without_spaces( nameFunction );
-  PosFunctionInCodeInter = findStartPointOfFunction( nameFunction );
-  if ( PosFunctionInCodeInter != 0xFF )
-  {
-
-    InterCode[ InterCodeIndex++ ] = instructions.CLONE;
-    InterCode[ InterCodeIndex++ ] = PosFunctionInCodeInter;
-    InterCode[ InterCodeIndex++ ] = instructions.CLONE_END;
-    cloneCount++;
-    InterCodeIndex[cloneCount] = PosFunctionInCodeInter;
-  }
-  else
-  {
-    showErrorMessage(6);
-  }
-}
 
 //<conditional> ::= <simple condition> | <composed condition>
 function conditional(){
