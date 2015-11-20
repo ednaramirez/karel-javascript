@@ -154,15 +154,9 @@ function expression()
         iterate_expression();
       }
       else {
-        if(read("clone")){
-          console.log("desc_karel.js::expression::read a clone");
-          clone_expression();
-        }
-        else
-        {
           call_function();
-        }
       }
+      
     }
   }
 }
@@ -171,17 +165,6 @@ function expression()
 function call_function()
 {
   name_of_function();
-  if ( require("(") )
-  {
-    if ( !require(")") )
-    {
-      showErrorMessage( 2 );
-    }
-  }
-  else
-  {
-    showErrorMessage( 5 );
-  }
 }
 
 //<name of function> ::= <official function> | <customer function>
@@ -191,7 +174,8 @@ function name_of_function()
    read("turnoff") ||
    read("pickbeeper") ||
    read("turnleft") ||
-   read("putbeeper")
+   read("putbeeper") ||
+   read("clone")
    )
   {
     official_function();
@@ -214,29 +198,96 @@ function name_of_function()
   {
     if ( read("move")){
       require("move");
-      InterCode[ InterCodeIndex++ ] = instructions.MOVE;
-
+      if ( require("(") )
+      {
+        if ( !require(")") )
+        {
+          showErrorMessage( 2 );
+        }
+        else{
+          InterCode[ InterCodeIndex++ ] = instructions.MOVE;
+        }
+      }
+      else
+      {
+        showErrorMessage( 5 );
+      }
 
     }
     else if(read("turnoff")){
       require("turnoff");
-      InterCode[ InterCodeIndex++ ] = instructions.TURNOFF;
+      if ( require("(") )
+      {
+        if ( !require(")") )
+        {
+          showErrorMessage( 2 );
+        }
+        else{
+          InterCode[ InterCodeIndex++ ] = instructions.TURNOFF;
+        }
+      }
+      else
+      {
+        showErrorMessage( 5 );
+      }
 
     }
     else if(read("pickbeeper")) {
       require("pickbeeper");
-      InterCode[ InterCodeIndex++ ] = instructions.PICKBEEPER;
-
+      if ( require("(") )
+      {
+        if ( !require(")") )
+        {
+          showErrorMessage( 2 );
+        }
+        else{
+          InterCode[ InterCodeIndex++ ] = instructions.PICKBEEPER;
+        }
+      }
+      else
+      {
+        showErrorMessage( 5 );
+      }
     }
     else if(read("turnleft")){
       require("turnleft");
-      InterCode[ InterCodeIndex++ ] = instructions.TURNLEFT;
+      if ( require("(") )
+      {
+        if ( !require(")") )
+        {
+          showErrorMessage( 2 );
+        }
+        else{
+          InterCode[ InterCodeIndex++ ] = instructions.TURNLEFT;
+        }
+      }
+      else
+      {
+        showErrorMessage( 5 );
+      }
 
     }
-    else{
+    else if(read("putbeeper")){
       require("putbeeper");
-      InterCode[ InterCodeIndex++ ] = instructions.PUTBEEPER;
-
+      if ( require("(") )
+      {
+        if ( !require(")") )
+        {
+          showErrorMessage( 2 );
+        }
+        else{
+          InterCode[ InterCodeIndex++ ] = instructions.PUTBEEPER;
+        }
+      }
+      else
+      {
+        showErrorMessage( 5 );
+      }
+    }
+    else if(read("clone")){
+      // require("clone");
+      // InterCode[ InterCodeIndex++ ] = instructions.CLONE;
+      clone_expression();
     }
   }
 
@@ -246,11 +297,21 @@ function customer_function()
   var nameFunction = string_without_spaces();
 
   var PosFunctionInCodeInter = findStartPointOfFunction( nameFunction );
-  console.log("nameFunction "+nameFunction+" PosFunctioninIntercode "+PosFunctionInCodeInter);
+  // console.log("nameFunction "+nameFunction+" PosFunctioninIntercode "+PosFunctionInCodeInter);
   if ( PosFunctionInCodeInter != -1 )
   {
-    InterCode[ InterCodeIndex++ ] = instructions.CALL;
-    InterCode[ InterCodeIndex++ ] = PosFunctionInCodeInter;
+    if(require("(")){
+      if(require(")")){
+        InterCode[ InterCodeIndex++ ] = instructions.CALL;
+        InterCode[ InterCodeIndex++ ] = PosFunctionInCodeInter;
+      }
+      else{
+        showErrorMessage(2);
+      }
+    }
+    else{
+      showErrorMessage(5);
+    }
   }
   else
   {
@@ -447,14 +508,14 @@ function clone_expression(){
   if(require("clone")){
     if(require("(")){
       InterCode[ InterCodeIndex++ ] = instructions.CLONE;
-      console.log("Current token in clone expression");
-      console.log(aTokensInput[currentToken]);
+      // console.log("Current token in clone expression");
+      // console.log(aTokensInput[currentToken]);
       call_function();
       InterCode[ InterCodeIndex++ ] = instructions.CLONE_END;
-      console.log("Current token in clone expression");
-      console.log(aTokensInput[currentToken]);
+      // console.log("Current token in clone expression");
+      // console.log(aTokensInput[currentToken]);
       if(!require(")")){
-        showErrorMessage(8);
+        showErrorMessage(3);
       }
     }
     else{
