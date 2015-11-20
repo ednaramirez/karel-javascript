@@ -13,7 +13,6 @@ var camera,
 		plane4,
 		center,
 		facing = ['FRONT', 'LEFT', 'BACK', 'RIGHT'],
-		facingIndex = 0,
 		rays = [
 			new THREE.Vector3(0, 0, 1),
 			new THREE.Vector3(1, 0, 1),
@@ -38,33 +37,46 @@ var world = [
 			];
 var maze = {width: world.length, large:world.length, cellSize:500};
 
-var karelPosX, karelPosY;
 var karelArr = [];
-var karelStartPosition = [0];
 var currentKarel = 0;
-var movementSequence = [];
-var beginProgram;
-
+var beginProgram, initialDuration = 1000;
 window.wallGeometries = [];
 var beeperArray = [];
-function addKarel (){
-	var loader = new THREE.OBJMTLLoader();
-	loader.load( "android.obj", "android.mtl", function( object ) {
+var errorMessage;
+function addKarelModel (karel, index){
+	console.log("Adding karel model: ");
+	console.log(karel);
+	var wallTexture = THREE.ImageUtils.loadTexture('textures/Wall_Texture_by_shadowh3.jpg');
+		wallTexture.wrapS = THREE.RepeatWrapping;
+		wallTexture.wrapT = THREE.RepeatWrapping;
+		wallTexture.needsUpdate = true;
+	function getRandomColor() {
+	    var letters = '0123456789ABCDEF'.split('');
+	    var color = '#';
+	    for (var i = 0; i < 6; i++ ) {
+	        color += letters[Math.floor(Math.random() * 16)];
+	    }
+	    return color;
+	}
+	var karelModel = new THREE.Mesh(geometrySphere, new THREE.MeshBasicMaterial({map : wallTexture, color: getRandomColor(), wireframe: false}));
 
-		object.scale.x=object.scale.z=object.scale.y=100;
-		object.traverse( function ( child )
-		{
-			if ( child instanceof THREE.Mesh )
-				child.material.color.setRGB (Math.random(), Math.random(), Math.random());
-		});
-
-		karelArr[currentKarel] = object;
-		karelArr[currentKarel].rotation.y += Math.PI / 2;
-		karelArr[currentKarel].position.x = 0;
-		karelArr[currentKarel].position.z = 0;
-
-		scene.add(karelArr[currentKarel++]);
-	} );
+	karelModel.position.x = translateToCartesianY(karel.y)*maze.cellSize;
+	karelModel.position.z = translateToCartesianX(karel.x)*maze.cellSize;
+	karelModel.rotation.y += (karel.facingIndex*Math.PI) / 2;
+	console.log("X "+translateToCartesianY(karel.y)+" Y "+translateToCartesianX(karel.x))
+	karelModel.name = "karel"+(index);
+	karel.karelModel = karelModel;
+}
+function addKarel(){
+	karelArr.push({
+		x: translateToMatricialX(0),
+		y: translateToMatricialY(0),
+		movementSequence: [],
+		beeperCount: 0,
+		startSequence: 0,
+		facingIndex: 0,
+		parent: 0
+	});
 }
 function init() {
 
@@ -104,9 +116,6 @@ function init() {
 //		karel = new THREE.Mesh(geometrySphere, new THREE.MeshBasicMaterial({map : wallTexture,color: 0x00ff00, wireframe: false}));
 
 
-
-
-
 		plane2 = new THREE.Mesh(geometryPlane, material);
 		plane2.rotation.x = -Math.PI/2;
 		plane2.position.y=-250;
@@ -139,12 +148,7 @@ function init() {
 			}
 		}
 		//wall.rotation.x = -Math.PI/2;
-		karelPosX = translateToMatricialX(0);
-		karelPosY = translateToMatricialY(0);
-
-		addKarel();
 		scene.add(sphere);
-
 		scene.add(plane2);
 
 		//addiding some light to the scene
@@ -159,7 +163,6 @@ function init() {
 		renderer.setSize(window.innerWidth, window.innerHeight);
 		window.camera = camera;
 		document.body.insertBefore(renderer.domElement, document.getElementById('footer'));
-		document.addEventListener('keydown', onDocumentKeyDown, false);
 
 };
 
@@ -178,88 +181,93 @@ function translateToMatricialX(position){
 	return (Math.floor(maze.width/2)) + Math.round(position/maze.cellSize);
 }
 
-function onDocumentKeyDown(e){
-		var keyCode = e.which||e.keyCode;
-		if(keyCode == 87){
-			move();
-		}
-		if(keyCode == 65){
-			rotate();
-		}
-
-};
-
-var rotate = function(){
-	facingIndex++;
-	if(facingIndex==4) {
-		facingIndex = 0;
+var rotate = function(karel){
+	karel.facingIndex++;
+	if(karel.facingIndex==4) {
+		karel.facingIndex = 0;
 	}
-	movementSequence.push("rotate");
+	karel.movementSequence.push("rotate");
 	//karel.rotation.y += Math.PI / 2;
 }
-var move = function (){
-	var newPosition = hashCheck['FRONT'][facing[facingIndex]];
-	if((karelPosY+newPosition[0])<maze.width
-			&& (karelPosX + newPosition[1])<maze.width
-			&& (karelPosY+newPosition[0])>=0
-			&& (karelPosX + newPosition[1])>=0
-			&& (world[karelPosY + newPosition[0]][karelPosX + newPosition[1]] != "W")) {
-		karelPosX += newPosition[1];
-		karelPosY += newPosition[0];
-		movementSequence.push("move");
+var move = function (karel){
+	var newPosition = hashCheck['FRONT'][facing[karel.facingIndex]];
+	if((karel.y+newPosition[0])<maze.width
+			&& (karel.x + newPosition[1])<maze.width
+			&& (karel.y+newPosition[0])>=0
+			&& (karel.x + newPosition[1])>=0
+			&& (world[karel.y + newPosition[0]][karel.x + newPosition[1]] != "W")) {
+		karel.x += newPosition[1];
+		karel.y += newPosition[0];
+		karel.movementSequence.push("move");
+
+	}
+	else{
+		if(!errorMessage)errorMessage = "Bad movement from "+ currentKarel;
+		karel.movementSequence.push("kill");
 
 	}
 	//karel.translateX(maze.cellSize);
 
 }
-var pickbeeper = function (){
-	movementSequence.push("pickbeeper");
-}
-var putbeeper = function (){
-	movementSequence.push("putbeeper");
-}
-var rotateAnimation = function(){
-	karelArr[0].rotation.y += Math.PI / 2;
-}
 
-var moveAnimation = function(){
 
-	karelArr[0].translateZ(maze.cellSize);
-}
-var pickbeeperAnimate = function(){
-	var sceneObject = scene.getObjectByName(karelPosY.toString() + karelPosX.toString());
-	scene.remove(sceneObject);
-	
-}
-var putbeeperAnimate = function(x,y){
-	sphere = new THREE.Mesh(geometrySphere, new THREE.MeshBasicMaterial({map: new THREE.ImageUtils.loadTexture('textures/fire_texture.jpg')}));
-	sphere.position.z = translateToCartesianX(karelPosX)*maze.cellSize;
-	sphere.position.x = translateToCartesianY(karelPosY)*maze.cellSize;
-	sphere.name= karelPosY.toString() + karelPosX.toString();	
-	scene.add(sphere);
-	
-	
-}
-function checkCollide(){
-	ray = new THREE.Raycaster();
-	ray.far=100;
-	for (i = 0; i < rays.length; i ++ ) {
-		ray.set(karel.position, rays[i]);
-		if(ray.intersectObjects(wallGeometries).length>0){
-				karel.translateX(-maze.cellSize/2);
-				break;
-		}
-		if(ray.intersectObject(mesh).length>0){
-				scene.remove(mesh);
-				document.getElementById('cube').setAttribute('style','text-decoration:line-through;color:#007700');
-				break;
-		}
-		if(ray.intersectObject(sphere).length>0){
-				scene.remove(sphere);
-				document.getElementById('ball').setAttribute('style','text-decoration:line-through;color:#EE8712');
-				break;
-		}
+var checkBeepers = function (karel){
+
+var beepers = parseInt(world[karel.y][karel.x]);
+			
+	if(beepers > 0){
+		world[karel.y][karel.x] = (beepers - 1).toString() ;
+		karel.beeperCount++;	
+	} 
+	else{
+		if(!errorMessage)errorMessage = "No beeper to pick from " + currentKarel;
+		karel.movementSequence.push("kill");
 	}
+}
+var pickbeeper = function (karel){
+	karel.movementSequence.push("pickbeeper");
+}
+var putbeeper = function (karel){
+	karel.movementSequence.push("putbeeper");
+}
+var rotateAnimation = function(karel, duration){
+	var self = karel;
+	setTimeout(function (){
+		self.karelModel.rotation.y += Math.PI / 2;
+	}, duration);
+}
+
+var moveAnimation = function(karel, duration){
+	var self = karel;
+	setTimeout(function (){
+		self.karelModel.translateX(maze.cellSize);
+	}, duration);
+}
+var pickbeeperAnimate = function(karel, duration){
+	var self = karel;
+	
+	setTimeout(function (){
+		var sceneObject = scene.getObjectByName(translateToMatricialY(self.karelModel.position.x).toString()+translateToMatricialX(self.karelModel.position.z).toString());
+		scene.remove(sceneObject);
+
+	}, duration);
+}
+var putbeeperAnimate = function(karel, duration){
+	var self = karel;
+	setTimeout(function (){
+		sphere = new THREE.Mesh(geometrySphere, new THREE.MeshBasicMaterial({map: new THREE.ImageUtils.loadTexture('textures/fire_texture.jpg')}));
+		sphere.position.z = self.karelModel.position.z;
+		sphere.position.x =  self.karelModel.position.x;
+		sphere.name=translateToMatricialY(self.karelModel.position.x).toString()+translateToMatricialX(self.karelModel.position.z).toString();	
+		console.log(sphere);
+		scene.add(sphere);
+	}, duration);
+}
+var killAnimate = function(karel, duration){
+	var self = karel;
+	setTimeout(function(){
+		alert(errorMessage);
+	},duration);
 }
 
 function animate() {
@@ -276,7 +284,6 @@ function animate() {
 
 };
 
-var beeperCount=0;;
 var hashCheck = {
 	"FRONT": {
 		"FRONT": [-1,0],
@@ -304,18 +311,20 @@ var hashCheck = {
 	}
 }
 
-
 var checkedPos;
 
 function execute(){
+	addKarel();
+	addKarelModel(karelArr[0], 0);
+
 	var ifStack = [], callStack = [];
 	var i=beginProgram;
-	var checkIfClear = function () {
-		if((karelPosY+checkedPos[0])<maze.width
-				&& (karelPosX + checkedPos[1])<maze.width
-				&& (karelPosY+checkedPos[0])>=0
-				&& (karelPosX + checkedPos[1])>=0
-				&& (world[karelPosY + checkedPos[0]][karelPosX + checkedPos[1]] != "W")) {
+	var checkIfClear = function (karel, checkedPos) {
+		if((karel.y+checkedPos[0])<maze.width
+				&& (karel.x + checkedPos[1])<maze.width
+				&& (karel.y+checkedPos[0])>=0
+				&& (karel.x + checkedPos[1])>=0
+				&& (world[karel.y + checkedPos[0]][karel.x + checkedPos[1]] != "W")) {
 			ifStack.push(1);
 
 		}
@@ -323,12 +332,12 @@ function execute(){
 			ifStack.push(0);
 		}
 	},
-	checkIfBlocked = function (checkedPos) {
-		if(karelPosY+checkedPos[0]>=maze.width
-			&& karelPosX + checkedPos[1]>=maze.width
-			&& karelPosY+checkedPos[0]<0
-			&& karelPosX + checkedPos[1]<0
-			&& world[karelPosY+checkedPos[0]][karelPosX+checkedPos[1]]=="W"){
+	checkIfBlocked = function (karel, checkedPos) {
+		if(karel.y+checkedPos[0]>=maze.width
+			&& karel.x + checkedPos[1]>=maze.width
+			&& karel.y+checkedPos[0]<0
+			&& karel.x + checkedPos[1]<0
+			&& world[karel.y+checkedPos[0]][karel.x+checkedPos[1]]=="W"){
 			ifStack.push(1);
 		}
 		else{
@@ -336,44 +345,41 @@ function execute(){
 		}
 	};
 	while(InterCode[i] != instructions.TURNOFF){
-		console.log("i: "+i+" @");
+		console.log("i: "+i+" @ "+currentKarel);
 		switch(InterCode[i]){
 
 			case instructions.MOVE:
-
-					move();
-
+					move(karelArr[currentKarel]);
 					break;
 
 			case instructions.TURNLEFT:
-					rotate();
+					rotate(karelArr[currentKarel]);
 					break;
-
 
 			//CASES FOR FACING
 			case instructions.FACING_NORTH:
-				if(facingIndex==0){
+				if(karelArr[currentKarel].facingIndex==0){
 					ifStack.push(1);
 				}
 				else{ifStack.push(0);}
 
 				break;
 			case instructions.FACING_WEST:
-				if(facingIndex==1){
+				if(karelArr[currentKarel].facingIndex==1){
 					ifStack.push(1);
 				}
 				else{ifStack.push(0);}
 
 				break;
 			case instructions.FACING_SOUTH:
-				if(facingIndex==2){
+				if(karelArr[currentKarel].facingIndex==2){
 					ifStack.push(1);
 				}
 				else{ifStack.push(0);}
 
 				break;
 			case instructions.FACING_EAST:
-				if(facingIndex==3){
+				if(karelArr[currentKarel].facingIndex==3){
 					ifStack.push(1);
 				}
 				else{ifStack.push(0);}
@@ -382,28 +388,28 @@ function execute(){
 
 			//CASES FOR NOT FACING
 			case instructions.NOT_FACING_NORTH:
-				if(facingIndex!=0){
+				if(karelArr[currentKarel].facingIndex!=0){
 					ifStack.push(1);
 				}
 				else{ifStack.push(0);}
 
 				break;
 			case instructions.NOT_FACING_WEST:
-				if(facingIndex!=1){
+				if(karelArr[currentKarel].facingIndex!=1){
 					ifStack.push(1);
 				}
 				else{ifStack.push(0);}
 
 				break;
 			case instructions.NOT_FACING_SOUTH:
-				if(facingIndex!=2){
+				if(karelArr[currentKarel].facingIndex!=2){
 					ifStack.push(1);
 				}
 				else{ifStack.push(0);}
 
 				break;
 			case instructions.NOT_FACING_EAST:
-				if(facingIndex!=3){
+				if(karelArr[currentKarel].facingIndex!=3){
 					ifStack.push(1);
 				}
 				else{ifStack.push(0);}
@@ -413,49 +419,49 @@ function execute(){
 			//CASES FOR CLEAR AND BLOCKED
 			case instructions.FRONT_IS_CLEAR:
 				console.log("Checking front is clear")
-				checkedPos=hashCheck.FRONT[facing[facingIndex]];
-				console.log("Row: "+(karelPosY+checkedPos[0])+" column: "+(karelPosX+checkedPos[1]));
+				checkedPos=hashCheck.FRONT[facing[karelArr[currentKarel].facingIndex]];
+				console.log("Row: "+(karelArr[currentKarel].y+checkedPos[0])+" column: "+(karelArr[currentKarel].x+checkedPos[1]));
 				checkIfClear(checkedPos);
 				break;
 			case instructions.FRONT_IS_BLOCKED:
-				checkedPos=hashCheck.FRONT[facing[facingIndex]];
+				checkedPos=hashCheck.FRONT[facing[karelArr[currentKarel].facingIndex]];
 				checkIfBlocked(checkedPos);
 
 				break;
 			case instructions.LEFT_IS_CLEAR:
-				checkedPos=hashCheck.LEFT[facing[facingIndex]];
+				checkedPos=hashCheck.LEFT[facing[karelArr[currentKarel].facingIndex]];
 				checkIfClear(checkedPos);
 
 				break;
 			case instructions.LEFT_IS_BLOCKED:
-				checkedPos=hashCheck.LEFT[facing[facingIndex]];
+				checkedPos=hashCheck.LEFT[facing[karelArr[currentKarel].facingIndex]];
 				checkIfBlocked(checkedPos);
 
 				break;
 			case instructions.RIGHT_IS_CLEAR:
-				checkedPos=hashCheck.RIGHT[facing[facingIndex]];
+				checkedPos=hashCheck.RIGHT[facing[karelArr[currentKarel].facingIndex]];
 				checkIfClear(checkedPos);
 
 				break;
 			case instructions.RIGHT_IS_BLOCKED:
-				checkedPos=hashCheck.RIGHT[facing[facingIndex]];
+				checkedPos=hashCheck.RIGHT[facing[karelArr[currentKarel].facingIndex]];
 				checkIfBlocked(checkedPos);
 
 				break;
 			case instructions.BACK_IS_CLEAR:
-				checkedPos=hashCheck.BACK[facing[facingIndex]];
+				checkedPos=hashCheck.BACK[facing[karelArr[currentKarel].facingIndex]];
 				checkIfClear(checkedPos);
 
 				break;
 			case instructions.BACK_IS_BLOCKED:
-				checkedPos=hashCheck.BACK[facing[facingIndex]];
+				checkedPos=hashCheck.BACK[facing[karelArr[currentKarel].facingIndex]];
 				checkIfBlocked(checkedPos);
 
 				break;
 			//CASES FOR BEEPERS
 			case instructions.NEXT_TO_A_BEEPER:
 
-				if(parseInt(world[karelPosY][karelPosX])>0){
+				if(parseInt(world[karelArr[currentKarel].y][karelArr[currentKarel].x]) > 0){
 					ifStack.push(1);
 				}
 				else{
@@ -465,7 +471,7 @@ function execute(){
 				break;
 			case instructions.NOT_NEXT_TO_A_BEEPER:
 
-				if(!(parseInt(world[karelPosY][karelPosX])>0)){
+				if(!(parseInt(world[karelArr[currentKarel].y][karelArr[currentKarel].x]) > 0)){
 					ifStack.push(1);
 				}
 				else{
@@ -473,14 +479,14 @@ function execute(){
 				}
 				break;
 			case instructions.ANY_BEEPERS_IN_BEEPER_BAG:
-				if(beeperCount >0){
+				if(karelArr[currentKarel].beeperCount > 0){
 					ifStack.push(1);
 				}
 				else{ifStack.push(0);
 				}
 				break;
 			case instructions.NOT_ANY_BEEPERS_IN_BEEPER_BAG:
-				if(beeperCount == 0){
+				if(karelArr[currentKarel].beeperCount == 0){
 					ifStack.push(1);
 				}
 				else{ifStack.push(0);
@@ -531,7 +537,6 @@ function execute(){
 						i = InterCode[i+1] - 1;
 						console.log("NVM");
 					}
-					// cond = 0;
 					break;
 			case instructions.IF:
 					ifStack.push(InterCode[i]);
@@ -556,35 +561,44 @@ function execute(){
 					break;
 
 			case instructions.PICKBEEPER:
-				var beepers = parseInt(world[karelPosY][karelPosX]);
-			
-					if(beepers > 0){
-						world[karelPosY][karelPosX] = (beepers - 1).toString() ;
-						beeperCount++;	
-					} 
-					if(world[karelPosY][karelPosX] == "0"){
-						pickbeeper();
+					checkBeepers(karelArr[currentKarel]);
+					//kill
+					if(world[karelArr[currentKarel].y][karelArr[currentKarel].x] == "0"){
+						world[karelArr[currentKarel].y][karelArr[currentKarel].x] = "";
+						pickbeeper(karelArr[currentKarel]);
 					}
 					
 					break;
 			case instructions.PUTBEEPER:
-
-					var beepers = parseInt(world[karelPosY][karelPosX]);
+					if(karelArr[currentKarel].beeperCount == 0){
+						if(!errorMessage)errorMessage = "No beepers to put from "+ currentKarel;
+						karelArr[currentKarel].movementSequence.push("kill");
+					}
+					var beepers = parseInt(world[karelArr[currentKarel].y][karelArr[currentKarel].x]);
+					console.log("Beepers "+beepers);
 					if(isNaN(beepers)){
-						world[karelPosY][karelPosX] = 1
-						putbeeper(karelPosY,karelPosX);
+						world[karelArr[currentKarel].y][karelArr[currentKarel].x] = 1
+						putbeeper(karelArr[currentKarel]);
 					}
 					else{
-					world[karelPosY][karelPosX] = (beepers  +1).toString() ;
+						world[karelArr[currentKarel].y][karelArr[currentKarel].x] = (beepers + 1).toString();
 					}	
-					beeperCount--;
+					karelArr[currentKarel].beeperCount--;
 					break;
 			case instructions.CLONE:
-					karelStartPosition.push(movementSequence.length-1);
-					console.log("KAGEBUNSHINNOJUTSU!!");
+					addKarel();
+					karelArr[karelArr.length-1].startSequence = karelArr[currentKarel].movementSequence.length;
+					karelArr[karelArr.length-1].x = karelArr[currentKarel].x;
+					karelArr[karelArr.length-1].y = karelArr[currentKarel].y;
+					console.log("Clone position ");
+					console.log(karelArr[karelArr.length-1])
+					karelArr[karelArr.length-1].parent = currentKarel;
+					karelArr[karelArr.length-1].facingIndex = karelArr[currentKarel].facingIndex;
+					addKarelModel(karelArr[karelArr.length-1], karelArr.length-1);
+					currentKarel = karelArr.length-1;
 					break;
 			case instructions.CLONE_END:
-					console.log("Clone Cancel");
+					currentKarel = karelArr[currentKarel].parent;
 					break;
 			default:
 					alert("Unknown command " + InterCode[i]);
@@ -595,26 +609,41 @@ function execute(){
 		i++;
 
 	}
-
-	var duration = 0, deltaDuration=500;
-	for(var p=0;p<movementSequence.length;p++){
-		duration+=deltaDuration;
-		console.log(duration);
-		switch(movementSequence[p]){
-			case 'move':
-				setTimeout(moveAnimation,duration);
-				break;
-			case 'rotate':
-				setTimeout(rotateAnimation,duration);
-				break;
-			case 'pickbeeper':
-				setTimeout(pickbeeperAnimate,duration);	
-				break;
-			case 'putbeeper':
-				setTimeout(putbeeperAnimate,duration);	
-				break;
+	function initialize(karel, duration){
+		var self = karel;
+		setTimeout(
+			function(){scene.add(self.karelModel)
+		}, duration);
+	}
+	
+		var duration, deltaDuration=500;
+		for(var k = 0 ; k < karelArr.length ; k++){
+			console.log("Karel in position ",k);
+			console.log(karelArr[k]);
+			
+			duration = initialDuration+((karelArr[k].startSequence)*deltaDuration);
+			initialize(karelArr[k], duration);
+			for(var p=0;p<karelArr[k].movementSequence.length;p++){
+				duration+=deltaDuration;
+				var currentAnimationKarel = karelArr[k];
+				console.log(duration + "Object:Object" + currentAnimationKarel.karelModel.name);
+				switch(currentAnimationKarel.movementSequence[p]){
+					case 'move':
+						moveAnimation(currentAnimationKarel, duration);
+						break;
+					case 'rotate':
+						rotateAnimation(currentAnimationKarel, duration);
+						break;
+					case 'pickbeeper':
+						pickbeeperAnimate(currentAnimationKarel, duration);	
+						break;
+					case 'putbeeper':
+						putbeeperAnimate(currentAnimationKarel, duration);	
+						break;
+					case 'kill':
+						killAnimate(currentAnimationKarel,duration);
+						return;
+				}
+			}
 		}
 	}
-
-
-}

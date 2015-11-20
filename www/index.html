@@ -36,111 +36,44 @@
     <script>
         var code = "class program{" +
                         "void coso(){" +
+                            "turnleft()" +
                             "move()" +
+                            //"move()" +
+                            "turnleft()" +
+                            //"move()" +
+                            "turnleft()" +
+                            "pickbeeper()" +
+                            "pickbeeper()" +
+
+                            //"move()" +
                         "}" +
                         "program(){" +
                             "turnleft()" +
                             "turnleft()" +
                             "turnleft()" +
-                            "clone(coso())" +
-                            "iterate(1){" +
-                                "coso()" +
-                            "}" +
-                            "pickbeeper()" +
+                            "move()" +
+                            "move()" +
+                            //"clone(coso())" +
+                            //"pickbeeper()" +
+                            //"putbeeper()" +
+                            //"putbeeper()" +
+                            //"putbeeper()" +
+                            //"putbeeper()" +
+                            "turnleft()" +
+                            "turnleft()" +
+                            "move()" +
+                            "putbeeper()" +
+                            //"putbeeper()" +
+                            "move()" +
                             "turnoff()" +
                         "}" +
                     "}"
 
-			init();
-			var aTokensInput =
-	      [
-	       "class",
-            "program",
-            "{",
-            "void",
-            "coso",
-            "(",
-            ")",
-            "{",
-            "move",
-            "(",
-            ")",
-            "}",
-            "program",
-            "(",
-            ")",
-            "{",
-            //PROGRAM TOOLBOX 
-            // "(",
-            // ")",
-
-            // "if",
-            // "(",
-            // "", // Condition
-            // ")",
-            // "{",
-            // "move", // Action
-            // "(",
-            // ")",
-            // "}",
-            // "else", // Else
-            // "{",
-            // "", // Action
-            // "(",
-            // ")",
-            // "}",
-
-            // "while",
-            // "(",
-            // "", // Condition
-            // ")",
-            // "{",
-            // "", // Action
-            // "(",
-            // ")",
-            // "}",
-
-            //PROGRAM TOOLBOX END
-            "turnleft",
-            "(",
-            ")",
-            "turnleft",
-            "(",
-            ")",
-            "turnleft",
-            "(",
-            ")",
-            "clone",
-            "(",
-            "coso",
-            ")",
-            "iterate",
-            "(",
-            "1", //Condition
-            ")",
-            "{",
-            "coso", //Action
-            "(",
-            ")",
-            "}",
-            "putbeeper",
-            "(",
-            ")",
-
-            "pickbeeper",
-            "(",
-            ")",
-            "turnoff",
-            "(",
-            ")",
-            "}",
-            "}"
-	      ],
+    	init();
         currentToken = 0;
         aTokensInput = lexAnalyzer(code);
-    program();
-    execute();
-
+        program();
+        execute();
     </script>
 </body>
 </html>
