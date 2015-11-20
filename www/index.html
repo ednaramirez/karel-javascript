@@ -1,29 +1,27 @@
 <!doctype html>
 <html lang="en">
 <head>
+    <link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css"></link>
+
     <meta charset="UTF-8">
     <title>CocoKarel</title>
-    <style>
-    body {
-        color: #ffffff;
-        font-family:Monospace;
-        font-size:13px;
-        text-align:center;
-        font-weight: bold;
-
-        background-color: #000000;
-        margin: 0px;
-        overflow: hidden;
-        cursor: none;
-    }
-    ul {
-        list-style: none;
-    }
-
-    </style>
 </head>
 <body>
+<div class="container">
+    <div class="row">
+        <div class="col-md-6">
+            <h4>Your program's code</h4>
+            <textarea class="form-control" rows="10" id="code"></textarea>
+            <input type="button" class="btn btn-primary" value="Execute" id="compile">
+        </div>
+        <div class="col-md-6" id="karel-body">
 
+        </div>
+    </div>
+</div>
+
+    <script src="//code.jquery.com/jquery-1.11.3.min.js"></script>
+    <script src="//code.jquery.com/jquery-migrate-1.2.1.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r73/three.js"></script>
     <script src="MTLLoader.js"></script>
     <script src="OBJMTLLoader.js"></script>
@@ -93,12 +91,72 @@
                             "turnoff()" +
                         "}" +
                     "}";
+        code = "class program{\n" +
+                "\tvoid coso(){\n" +
+                "\t\tturnleft()\n"+
+                "\t\tmove()\n" +
+                    //"move()" +
+                "\t\tturnleft()\n" +
+                    //"move()" +
+                "\t\tturnleft()\n" +
+                "\t\tpickbeeper()\n" +
+                "\t\tpickbeeper()\n" +
 
-    	init();
-        currentToken = 0;
-        aTokensInput = lexAnalyzer(code);
-        program();
-        execute();
+                    //"move()" +
+                "\t}\n" +
+                "\tprogram(){\n" +
+                "\t\tturnleft()\n" +
+                "\t\tturnleft()\n" +
+                "\t\tturnleft()\n" +
+                "\t\tmove()\n" +
+                "\t\tmove()\n" +
+                    //"clone(coso())" +
+                "\t\tpickbeeper()\n" +
+                    // "putbeeper()" +
+                    //"putbeeper()" +
+                    //"putbeeper()" +
+                    //"putbeeper()" +
+                "\t\tturnleft()\n" +
+                "\t\tturnleft()\n" +
+                "\t\tmove()\n" +
+                "\t\tputbeeper()\n" +
+                    //"putbeeper()" +
+                "\t\tmove()\n" +
+                "\t\tturnoff()\n" +
+                "\t}\n" +
+                "}\n"
+        $("#code").val(code);
+
+        $(document).delegate('#code', 'keydown', function(e) {
+            var keyCode = e.keyCode || e.which;
+
+            if (keyCode == 9) {
+                e.preventDefault();
+                var start = $(this).get(0).selectionStart;
+                var end = $(this).get(0).selectionEnd;
+
+                // set textarea value to: text before caret + tab + text after caret
+                $(this).val($(this).val().substring(0, start)
+                        + "\t"
+                        + $(this).val().substring(end));
+
+                // put caret at right position again
+                $(this).get(0).selectionStart =
+                        $(this).get(0).selectionEnd = start + 1;
+            }
+        });
+
+        $("#compile").click(function () {
+            aTokensInput = lexAnalyzer($("#code").val());
+
+            currentToken = 0;
+            //aTokensInput = lexAnalyzer(code);
+            $(this).attr("disabled","disabled");
+            $(this).parent().append("<a href='/' class='btn btn-primary'>Try again</a>")
+            program();
+            init();
+            execute();
+        });
     </script>
 </body>
 </html>

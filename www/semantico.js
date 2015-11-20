@@ -7,13 +7,10 @@ var camera,
 		renderer,
 		geometry,
 		material,
-		mesh,
 		sphere,
 		pointLight,
 		plane,
 		plane2,
-		plane3,
-		plane4,
 		center,
 		facing = ['FRONT', 'LEFT', 'BACK', 'RIGHT'],
 		rays = [
@@ -44,7 +41,7 @@ var world = [
 			['','','','','',''],
 			['','','','','','']
 			];
-var maze = {width: world.length, large:world.length, cellSize:500};
+var maze = {width: world.length, large:world.length, cellSize:100};
 
 /**
 * Variables needed for the logic of the program and its execution.
@@ -119,9 +116,7 @@ function init() {
 
 		scene = new THREE.Scene();
 
-		camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 1, 10000);
-		//camera.position.x = (posInitial.x-maze.width/2)*maze.cellSize;
-		//camera.position.z = (posInitial.z-maze.large/2)*maze.cellSize-maze.cellSize/2;
+		camera = new THREE.PerspectiveCamera(10, 500 / 500, 1, 8500);
 		camera.position.set(0,5000,0);
 		center = new THREE.Vector3(0,0,0);
 		camera.lookAt(center);
@@ -150,14 +145,9 @@ function init() {
 
 
 
-//		karel = new THREE.Mesh(geometrySphere, new THREE.MeshBasicMaterial({map : wallTexture,color: 0x00ff00, wireframe: false}));
-
-
 		plane2 = new THREE.Mesh(geometryPlane, material);
 		plane2.rotation.x = -Math.PI/2;
 		plane2.position.y=-250;
-		//plane.position.x = 0;
-		//plane.position.z = 0;
 
 		var wall;
 		var wallMaterial = new THREE.MeshBasicMaterial({ map : wallTexture, doubleSided: true,side: THREE.DoubleSide });
@@ -184,11 +174,9 @@ function init() {
 				}
 			}
 		}
-		//wall.rotation.x = -Math.PI/2;
 		scene.add(sphere);
 		scene.add(plane2);
 
-		//addiding some light to the scene
 		pointLight = new THREE.DirectionalLight( 0xffffff );
 		pointLight.position.set( 0, 0, 1 ).normalize();
 		var ambientLight = new THREE.AmbientLight(0xffffff);
@@ -197,9 +185,10 @@ function init() {
 
 
 		renderer = new THREE.WebGLRenderer();
-		renderer.setSize(window.innerWidth, window.innerHeight);
+		renderer.setSize(500, 500);
 		window.camera = camera;
-		document.body.insertBefore(renderer.domElement, document.getElementById('footer'));
+
+		document.getElementById('karel-body').insertBefore(renderer.domElement, document.getElementById('div'));
 
 };
 
@@ -236,8 +225,6 @@ function translateToMatricialY(position){
 * @return 
 */
 function translateToMatricialX(position){
-	//console.log(Math.round(position/maze.cellSize));
-	//console.log((Math.floor(maze.width/2)));
 	return (Math.floor(maze.width/2)) + Math.round(position/maze.cellSize);
 }
 /**
@@ -252,7 +239,6 @@ var rotate = function(karel){
 		karel.facingIndex = 0;
 	}
 	karel.movementSequence.push("rotate");
-	//karel.rotation.y += Math.PI / 2;
 }
 /**
 * 
@@ -277,7 +263,6 @@ var move = function (karel){
 		karel.movementSequence.push("kill");
 
 	}
-	//karel.translateX(maze.cellSize);
 
 }
 /**
