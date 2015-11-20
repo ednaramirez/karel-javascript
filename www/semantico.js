@@ -1,10 +1,13 @@
+/**
+* Variables needed for graphics
+*/
+
 var camera,
 		scene,
 		renderer,
 		geometry,
 		material,
 		mesh,
-		karel,
 		sphere,
 		pointLight,
 		plane,
@@ -23,10 +26,15 @@ var camera,
 			new THREE.Vector3(-1, 0, 0),
 			new THREE.Vector3(-1, 0, 1)
 		];
+/**
+* Variables for initializing the world of karel.
+* The variable world consists of a square matrix were every space consists of a single character:
+* 		void: 		space
+* 		"W": 		wall
+* 		number: 	beeper(s)
+* The variable maze is a structure for the graphics containing information about the world boundaries and unit size.
+*/
 
-var mouseX = 0,
-		mouseY = 0,
-		mouseZ = 0;
 var world = [
 			['','','','','W',''],
 			['','','','','W','2'],
@@ -37,12 +45,13 @@ var world = [
 			];
 var maze = {width: world.length, large:world.length, cellSize:500};
 
+
 var karelArr = [];
 var currentKarel = 0;
 var beginProgram, initialDuration = 1000;
 window.wallGeometries = [];
-var beeperArray = [];
 var errorMessage;
+
 function addKarelModel (karel, index){
 	console.log("Adding karel model: ");
 	console.log(karel);

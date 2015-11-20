@@ -391,19 +391,6 @@ function elseif( PosX_jmptrue )
     showErrorMessage(4);
   }
 }
-// <composed condition> ::= <not condition> <simple condition>
-
-// <composed condition prima>
-
-// <not condition> ::= "!" | lambda
-
-// <composed condition prima> ::= <or condition> | lambda
-
-// <or condition> ::= "||" <simple condition> | <and condition>
-
-// <and condition> ::= "&&" <simple condition> | lambda
-
-
 
 //<iterate expression> ::= "iterate" "(" <number> ")" "{" <body> "}"
 
@@ -455,6 +442,7 @@ function iterate_expression(){
   }
 }
 
+//<clone expression> := "clone" "(" <customer function "(" ")" ")"
 function clone_expression(){
   if(require("clone")){
     if(require("(")){
@@ -480,6 +468,10 @@ function clone_expression(){
 
 
 //<conditional> ::= <simple condition> | <composed condition>
+// <composed condition> ::= <not condition> <simple condition>
+// <not condition> ::= "!" | lambda
+// <composed condition prima>
+// <composed condition prima> ::= <or condition> | lambda
 function conditional(){
 	// do{
 		if (read("!")) {
@@ -513,34 +505,34 @@ function conditional(){
 	// }while ((read("!") || read("||") || read("&&") || read_simple_condition()))
 }
 
-function or_condition(){
-	
+// <or condition> ::= "||" <simple condition> | <and condition>
+
+function or_condition(){	
   InterCode [InterCodeIndex++] = instructions.OR;
-
-
   if (require_simple_condition()){
 
-   if(require("||")){
-
-     if(require_simple_condition()){
-      return
+    if(require("||")){
+ 
+      if(require_simple_condition()){
+        return;
+      }
+      else{
+        showErrorMessage(5);
+      }
     }
     else{
-      showErrorMessage(5);
+     showErrorMessage(2);
     }
   }
   else{
-   showErrorMessage(2);
- }
+    showErrorMessage(5);
+  }
 }
-else{
-  showErrorMessage(5);
-}
-}
+
+// <and condition> ::= "&&" <simple condition> | lambda
 
 function and_condition(){
 	InterCode [InterCodeIndex++] = instructions.AND;
-
 	if (require_simple_condition()){
 		if(require("&&")){
 			if(require_simple_condition()){
@@ -551,108 +543,14 @@ function and_condition(){
       }
     }
     else{
-     showErrorMessage(2);
-   }
- }
- else{
-  showErrorMessage(5);
-}
-}
-
-function read_simple_condition(){
-
-	return (read("frontIsClear") ||
-   read("frontIsBlocked") ||
-   read("leftIsClear") ||
-   read("leftIsBlocked") ||
-   read("rightIsClear") ||
-   read("rightIsBlocked") ||
-   read("nextToABeeper") ||
-   read("notNextToABeeper") ||
-   read("anyBeepersInBeeperBag") ||
-   read("noBeepersInBeeperBag") ||
-   read("facingNorth") ||
-   read("facingSouth") ||
-   read("facingEast") ||
-   read("facingWest") ||
-   read("notFacingNorth") ||
-   read("notFacingSouth") ||
-   read("notFacingEast") ||
-   read("notFacingWest")
-   );
-}
-function translate(instruction){
-  string = "";
-  for(var i = 0; i<instruction.length;i++){
-    if(instruction[i]>='A' && instruction[i]<='Z'){
-      string+='_';
+      showErrorMessage(2);
     }
-    string += instruction[i].toUpperCase();
-  }
-  return string;
-}
-function require_simple_condition(){
-
-  
-  if(read_simple_condition()){
-
-    InterCode[InterCodeIndex++]=instructions[translate(aTokensInput[currentToken++])]
-    return true;
   }
   else{
-    return false;
-  }
- 
-
-}
-/*function conditional()
-{
-  var condition;
-
-  if(leerCondicional(&condition))
-  {
-    exigir(conditionals[condition]);
-    InterCode[InterCodeIndex++] = condition;
-
-    if(leer("&&") || leer("||"))
-    {
-      if(exigir("&&"))
-      {
-        if(leerCondicional(&condition))
-        {
-          exigir(conditionals[condition]);
-          InterCode[InterCodeIndex++] = condition;
-          InterCode[InterCode++] =
-        }
-        else {
-          showErrorMessage(7);
-        }
-      }
-      else
-      {
-        //kewl
-      }
-    }
-  }
-  else
-  {
-    showErrorMessage(7);
+   showErrorMessage(5);
   }
 }
 
-function leerCondicional(condition)
-{
-  int i;
-  for(i=0;i<sizeof(conditionals);i++){
-    if(leer(conditionals[i])){
-      condition = i;
-      return true;
-    }
-  }
-  condition = -1;
-  return false;
-}
-*/
 /*
 <simple condition> ::=
     "frontIsClear"
@@ -674,3 +572,46 @@ function leerCondicional(condition)
   | "notFacingEast"
   | "notFacingWest"
 */
+
+function require_simple_condition(){
+  if(read_simple_condition()){
+    InterCode[InterCodeIndex++]=instructions[translate(aTokensInput[currentToken++])]
+    return true;
+  }
+  else{
+    return false;
+  }
+}
+
+function read_simple_condition(){
+  return (read("frontIsClear") ||
+   read("frontIsBlocked") ||
+   read("leftIsClear") ||
+   read("leftIsBlocked") ||
+   read("rightIsClear") ||
+   read("rightIsBlocked") ||
+   read("nextToABeeper") ||
+   read("notNextToABeeper") ||
+   read("anyBeepersInBeeperBag") ||
+   read("noBeepersInBeeperBag") ||
+   read("facingNorth") ||
+   read("facingSouth") ||
+   read("facingEast") ||
+   read("facingWest") ||
+   read("notFacingNorth") ||
+   read("notFacingSouth") ||
+   read("notFacingEast") ||
+   read("notFacingWest")
+   );
+}
+
+function translate(instruction){
+  string = "";
+  for(var i = 0; i<instruction.length;i++){
+    if(instruction[i]>='A' && instruction[i]<='Z'){
+      string+='_';
+    }
+    string += instruction[i].toUpperCase();
+  }
+  return string;
+}

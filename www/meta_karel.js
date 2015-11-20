@@ -1,6 +1,13 @@
+/**
+*Standard Underlying layer for the recursive descendent containing very basic functions and variables for the creation of the Intercode
+*/
 
-var MAX_LENGHT_IDENTIFICADOR = 25,
-	MAX_SYMBOL = 25,
+/**
+* The instructions hash table contains the pre-set instructions for karel.
+* The intercode is composed of these instructions along with indexes for traversing the code
+*/
+var //MAX_LENGHT_IDENTIFICADOR = 25,
+	// MAX_SYMBOL = 25,
 	instructions = {'CALL': 1,
     'RET': 2,
     'JMP': 3,
@@ -38,41 +45,63 @@ var MAX_LENGHT_IDENTIFICADOR = 25,
     'CLONE_END' : 35,
     };
 
+/**
+* Variables needed for the creation of the Intercode and the Symbol table.
+*/
 var SymbolTable = []
 var InterCode = [];
 var InterCodeIndex = 0;
-var cloneCount = 0;
-var lastSymbol = 0;
+// var cloneCount = 0;
+// var lastSymbol = 0;
 
+/**
+* Returns the current token and advances the token index to the next token.
+*/
 function string_without_spaces(){
     return aTokensInput[currentToken++];
 
 }
 
+/**
+* Checks whether the current token is equal to the token sent as parameter.
+* Advances the token index effectively consuming the token.
+*/
 function require(requiredToken){
 	return requiredToken == aTokensInput[currentToken++];
 }
 
+/**
+*Requires the current token to be a number, returns boolean evaluation.
+*/
 function requireN(){
     return !isNaN(aTokensInput[currentToken]);
 }
 
+/**
+* Checks whether the current token is equal to the token sent as parameter.
+* Token index remains on the same position.
+*/
 function read(requiredToken){
 	return requiredToken == aTokensInput[currentToken];
 }
 
+/**
+* Returns an Intercode index corresponding to the starting point of the function name sent as parameter.
+*/
 function findStartPointOfFunction(nameFunction){
-    console.log("Find start of function "+nameFunction)
-    console.log(SymbolTable);
+    // console.log("Find start of function "+nameFunction)
+    // console.log(SymbolTable);
     if(SymbolTable[nameFunction]!=undefined){
         return SymbolTable[nameFunction];
     }
     return -1;
 }
-
+/**
+*Adds new function name to the Symbol table
+*/
 function AddNewFunction(requiredToken){
-    console.log("requiredToken: ")
-    console.log(requiredToken);
+    // console.log("requiredToken: ")
+    // console.log(requiredToken);
 	SymbolTable[requiredToken] = InterCodeIndex;
-    console.log(SymbolTable);
+    // console.log(SymbolTable);
 }
