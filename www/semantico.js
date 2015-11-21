@@ -588,7 +588,7 @@ function execute(){
 				else{ifStack.push(0);
 				}
 				break;
-			case instructions.NOT_ANY_BEEPERS_IN_BEEPER_BAG:
+			case instructions.NO_BEEPERS_IN_BEEPER_BAG:
 				if(karelArr[currentKarel].beeperCount == 0){
 					ifStack.push(1);
 				}
@@ -902,7 +902,7 @@ function execute(){
 					else{ifStack.push(0);
 					}
 					break;
-				case instructions.NOT_ANY_BEEPERS_IN_BEEPER_BAG:
+				case instructions.NO_BEEPERS_IN_BEEPER_BAG:
 					if(karelArr[currentKarel].beeperCount == 0){
 						ifStack.push(1);
 					}
@@ -1006,7 +1006,7 @@ function execute(){
 				case instructions.CLONE:
 						currentAnimationSteps.push(currentAnimationSteps[currentKarel]);
 						addKarel();
-						karelArr[karelArr.length-1].startSequence = karelArr[currentKarel].movementSequence.length;
+						karelArr[karelArr.length-1].startSequence = currentAnimationSteps[currentKarel];
 						karelArr[karelArr.length-1].x = karelArr[currentKarel].x;
 						karelArr[karelArr.length-1].y = karelArr[currentKarel].y;
 						console.log("Clone position ");
@@ -1023,7 +1023,6 @@ function execute(){
 						alert("Unknown command " + InterCode[i]);
 			}
 		}
-		// console.log("i: "+i+" InterCode: "+InterCode[i]);
 		i++;
 	}
 	/**
