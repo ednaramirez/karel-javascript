@@ -32,9 +32,66 @@
     <script src="error_lib.js"></script>
     <script src="semantico.js"></script>
     <script>
-
-
-        var code = "class program{\n" +
+        var code = "class program{" +
+                        "void coso(){" +
+                            "turnleft()" +
+                            // "move()" +
+                            //"move()" +
+                            "turnleft()" +
+                            //"move()" +
+                            "turnleft()" +
+                            // "pickbeeper()" +
+                            // "pickbeeper()" +
+                            "move()" +
+                            // "turnleft()" +
+                            // "turnleft()" +
+                            // "move()" +
+                            // "move()"+
+                            // "move()"+
+                            // "move()"+
+                            // "move()"+
+                        "}" +
+                        "void cosoa(){" +
+                            "clone(coso())"+
+                            "turnleft()" +
+                            "move()" +
+                            //"move()" +
+                            "turnleft()" +
+                            //"move()" +
+                            "turnleft()" +
+                            "pickbeeper()" +
+                            "pickbeeper()" +
+                            "move()" +
+                            "turnleft()" +
+                            "turnleft()" +
+                            "move()" +
+                            "move()"+
+                            "move()"+
+                            "move()"+
+                            "move()"+
+                        "}" +
+                        "program(){" +
+                            "turnleft()" +
+                            "turnleft()" +
+                            "turnleft()" +
+                            "move()" +
+                            "move()" +
+                            "clone(cosoa())" +
+                            "pickbeeper()" +
+                            // "putbeeper()" +
+                            //"putbeeper()" +
+                            //"putbeeper()" +
+                            //"putbeeper()" +
+                            "turnleft()" +
+                            "turnleft()" +
+                            "move()" +
+                            "putbeeper()" +
+                            //"putbeeper()" +
+                            "move()" +
+                            "turnoff()" +
+                        "}" +
+                    "}";
+        code = "class program{\n" +
                 "\tvoid coso(){\n" +
                 "\t\tturnleft()\n"+
                 "\t\tmove()\n" +

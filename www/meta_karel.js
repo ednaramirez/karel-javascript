@@ -100,8 +100,8 @@ function findStartPointOfFunction(nameFunction){
 *Adds new function name to the Symbol table
 */
 function AddNewFunction(requiredToken){
-    // console.log("requiredToken: ")
-    // console.log(requiredToken);
+    console.log("requiredToken: ")
+    console.log(requiredToken);
 	SymbolTable[requiredToken] = InterCodeIndex;
-    // console.log(SymbolTable);
+    console.log(SymbolTable);
 }
