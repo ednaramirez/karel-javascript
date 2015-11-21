@@ -40,7 +40,7 @@ window.wallGeometries = [];
 var errorMessage;
 
 function addKarelModel (karel, index){
-	var wallTexture = THREE.ImageUtils.loadTexture('textures/Wall_Texture_by_shadowh3.jpg');
+	var wallTexture = THREE.ImageUtils.loadTexture('textures/bmo.png');
 		wallTexture.wrapS = THREE.RepeatWrapping;
 		wallTexture.wrapT = THREE.RepeatWrapping;
 		wallTexture.needsUpdate = true;
@@ -82,13 +82,13 @@ function init() {
 		camera.lookAt(center);
 		camera.rotateOnAxis((new THREE.Vector3(0, 0, 1)).normalize(), Math.PI);
 		geometry = new THREE.CubeGeometry(maze.cellSize/2, maze.cellSize/2, maze.cellSize/2,16,16);
-		geometrySphere = new THREE.SphereGeometry(maze.cellSize/2, 16, 16);
+		geometrySphere = new THREE.SphereGeometry(maze.cellSize/3, 16, 16);
 		material = new THREE.MeshBasicMaterial({color: 0x00FF00, wireframe: true, side: THREE.DoubleSide});
 		geometryPlane = new THREE.CubeGeometry(maze.width*maze.cellSize, maze.large*maze.cellSize,20);
 		geometryPlaneBasic = new THREE.CubeGeometry(maze.cellSize, maze.cellSize, maze.cellSize);
 
 
-		var texture = THREE.ImageUtils.loadTexture('textures/floor5b.jpg', {}, function(){
+		var texture = THREE.ImageUtils.loadTexture('textures/floor.jpg', {}, function(){
 				renderer.render(scene, camera);
 				animate();
 		});
@@ -126,7 +126,7 @@ function init() {
 				}
 				if(parseInt(world[i][j])>0){
 					
-					sphere = new THREE.Mesh(geometrySphere, new THREE.MeshBasicMaterial({map: new THREE.ImageUtils.loadTexture('textures/fire_texture.jpg')}));
+					sphere = new THREE.Mesh(geometrySphere, new THREE.MeshBasicMaterial({map: new THREE.ImageUtils.loadTexture('textures/beeper.jpg')}));
 					sphere.position.z = translateToCartesianX(j)*maze.cellSize;
 					sphere.position.x = translateToCartesianY(i)*maze.cellSize;
 					sphere.name= i.toString() + j.toString();	
@@ -237,7 +237,7 @@ var pickbeeperAnimate = function(karel, duration){
 var putbeeperAnimate = function(karel, duration){
 	var self = karel;
 	setTimeout(function (){
-		sphere = new THREE.Mesh(geometrySphere, new THREE.MeshBasicMaterial({map: new THREE.ImageUtils.loadTexture('textures/fire_texture.jpg')}));
+		sphere = new THREE.Mesh(geometrySphere, new THREE.MeshBasicMaterial({map: new THREE.ImageUtils.loadTexture('textures/beeper.jpg')}));
 		sphere.position.z = self.karelModel.position.z;
 		sphere.position.x =  self.karelModel.position.x;
 		sphere.name=translateToMatricialY(self.karelModel.position.x).toString()+translateToMatricialX(self.karelModel.position.z).toString();	
