@@ -15,3 +15,6 @@ Then access [localhost:3030](http://localhost:3030) from your preferred web brow
 You can clone karel to perform a specific function calling clone(function()).
 
 Karel's initial position is in the middle of the canvas and the world can be edited in semantico.js to add more beepers or walls.
+
+# Sample program
+[See this video](https://drive.google.com/file/d/0B4V-uRwVjwi4eDYxbkNqbWZvU1k/view) to see a sample program that you can compile.
